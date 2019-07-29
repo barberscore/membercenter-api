@@ -1,0 +1,199 @@
+
+# Third-Party
+from dry_rest_permissions.generics import DRYPermissionsField
+from rest_framework.validators import UniqueTogetherValidator
+from rest_framework_json_api import serializers
+from rest_framework.serializers import SerializerMethodField
+
+# Local
+from .fields import TimezoneField
+
+from .models import Group
+from .models import Member
+from .models import Officer
+from .models import Person
+
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    permissions = DRYPermissionsField()
+    included_serializers = {
+        'repertories': 'apps.bhs.serializers.RepertorySerializer',
+        # 'members': 'apps.bhs.serializers.MemberSerializer',
+        # 'officers': 'apps.bhs.serializers.OfficerSerializer',
+    }
+
+    class Meta:
+        model = Group
+        fields = [
+            'id',
+            'name',
+            'status',
+            'kind',
+            'gender',
+            'representing',
+            'division',
+            'bhs_id',
+            'code',
+            'website',
+            'email',
+            'phone',
+            'fax_phone',
+            'start_date',
+            'end_date',
+            'location',
+            'facebook',
+            'twitter',
+            'youtube',
+            'pinterest',
+            'flickr',
+            'instagram',
+            'soundcloud',
+            'image',
+            'description',
+            'visitor_information',
+            'participants',
+            'chapters',
+            'notes',
+            'mc_pk',
+
+            'tree_sort',
+
+            'is_senior',
+            'is_youth',
+            'is_divided',
+
+            'owners',
+            'parent',
+            # 'children',
+
+            'repertories',
+            'permissions',
+
+            'nomen',
+            'image_id',
+        ]
+
+        read_only_fields = [
+            'nomen',
+            'image_id',
+        ]
+
+    class JSONAPIMeta:
+        included_resources = [
+            'repertories',
+            # 'members',
+            # 'officers',
+        ]
+
+    # def to_representation(self, instance):
+    #     if instance.kind <= 30:
+    #         self.fields.pop('members')
+    #     return super().to_representation(instance)
+
+
+class MemberSerializer(serializers.ModelSerializer):
+    permissions = DRYPermissionsField()
+
+    class Meta:
+        model = Member
+        fields = [
+            'id',
+            'status',
+            'part',
+            'start_date',
+            'end_date',
+            'group',
+            'person',
+            'permissions',
+        ]
+
+
+class OfficerSerializer(serializers.ModelSerializer):
+    permissions = DRYPermissionsField()
+
+    class Meta:
+        model = Officer
+        fields = [
+            'id',
+            'status',
+            'start_date',
+            'end_date',
+            'office',
+            'person',
+            'group',
+            'permissions',
+        ]
+
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Officer.objects.all(),
+                fields=('person', 'office'),
+                message='This person already holds this office.',
+            )
+        ]
+
+
+class PersonSerializer(serializers.ModelSerializer):
+    permissions = DRYPermissionsField()
+
+    class Meta:
+        model = Person
+        fields = [
+            'id',
+            'status',
+            'prefix',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'nick_name',
+            'suffix',
+            'birth_date',
+            'spouse',
+            'location',
+            'part',
+            'mon',
+            'gender',
+            'representing',
+            'is_deceased',
+            'is_honorary',
+            'is_suspended',
+            'is_expelled',
+            'website',
+            'email',
+            'address',
+            'home_phone',
+            'work_phone',
+            'cell_phone',
+            'airports',
+            'image',
+            'description',
+            'notes',
+            'bhs_id',
+            'mc_pk',
+
+            'nomen',
+            'full_name',
+            'common_name',
+            'sort_name',
+            'initials',
+            'image_id',
+            # 'current_through',
+            # 'current_status',
+            # 'current_district',
+
+            'user',
+            'permissions',
+        ]
+        read_only_fields = [
+            'nomen',
+            'full_name',
+            'common_name',
+            'sort_name',
+            'initials',
+            'image_id',
+            # 'current_through',
+            # 'current_status',
+            # 'current_district',
+        ]
+
