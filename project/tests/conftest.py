@@ -32,7 +32,7 @@
 # # @pytest.fixture(scope='session')
 # # def django_db_modify_db_settings():
 # #     from django.conf import settings
-# #     settings.DATABASES.pop('bhs_db')
+# #     settings.DATABASES.pop('source_db')
 
 
 # @pytest.fixture

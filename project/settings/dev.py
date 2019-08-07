@@ -85,7 +85,7 @@ LOGGING = {
     },
 }
 # Database
-DATABASES['bhs_db'] = dj_database_url.parse(
+DATABASES['source_db'] = dj_database_url.parse(
     get_env_variable("BHS_DATABASE_URL"),
     conn_max_age=600,
 )
