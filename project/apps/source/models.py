@@ -1,6 +1,3 @@
-# Third-Party
-from model_utils import Choices
-
 # Django
 from django.core.exceptions import ValidationError
 from django.db import models

@@ -1,7 +1,3 @@
-# Standard Library
-import time
-from datetime import date
-
 # Third-Party
 from algoliasearch_django.decorators import disable_auto_indexing
 from openpyxl import Workbook
@@ -13,18 +9,7 @@ from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
-from django.db.models import Case
-from django.db.models import CharField
-from django.db.models import DateField
-from django.db.models import F
-from django.db.models import IntegerField
 from django.db.models import Manager
-from django.db.models import Max
-from django.db.models import Min
-from django.db.models import OuterRef
-from django.db.models import Q
-from django.db.models import Subquery
-from django.db.models import When
 
 User = get_user_model()
 
@@ -665,3 +650,59 @@ class OfficerManager(Manager):
         t = orphans.count()
         orphans.delete()
         return t
+
+
+class MemberManager(Manager):
+    def update_or_create_from_join(self, join):
+        # Extract
+        Person = apps.get_model('bhs.person')
+        Group = apps.get_model('bhs.group')
+        if not isinstance(join, dict):
+            raise RuntimeError("Must be pre-validated")
+
+        mc_pk = join['id']
+        start_date = join['startest_date']
+        end_date = join['endest_date']
+        vocal_part = join['vocal_part']
+        group_pk = join['structure__id']
+        person_pk = join['subscription__human__id']
+        status = join['status']
+
+        # Transform
+        part = getattr(
+            self.model.PART,
+            vocal_part.strip().lower() if vocal_part else '',
+            None,
+        )
+
+        # Build dictionary
+        defaults = {
+            'mc_pk': mc_pk,
+            'status': status,
+            'start_date': start_date,
+            'end_date': end_date,
+            'part': part,
+        }
+
+        person = Person.objects.get(mc_pk=person_pk)
+        group = Group.objects.get(mc_pk=group_pk)
+
+        # Load
+        member, created = self.update_or_create(
+            person=person,
+            group=group,
+            defaults=defaults,
+        )
+        return member, created
+
+    def delete_orphans(self, joins):
+        # Delete Orphans
+        orphans = self.filter(
+            mc_pk__isnull=False,
+        ).exclude(
+            mc_pk__in=joins,
+        )
+        t = orphans.count()
+        orphans.delete()
+        return t
+

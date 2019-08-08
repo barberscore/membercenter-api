@@ -19,25 +19,17 @@ from phonenumber_field.modelfields import PhoneNumberField
 # Django
 from django.apps import apps
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import ArrayField
-from django.contrib.postgres.fields import DecimalRangeField
-from django.contrib.postgres.fields import IntegerRangeField
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.db import models
 from django.utils.functional import cached_property
-from django.utils.timezone import now
 
 # Local
 from .fields import ImageUploadPath
 from .fields import LowerEmailField
-from .fields import NoPunctuationCharField
-from .fields import ReasonableBirthDate
-from .fields import ValidatedPhoneField
-from .fields import VoicePartField
-# from .managers import MemberManager
+from .managers import MemberManager
 from .managers import GroupManager
 from .managers import OfficerManager
 from .managers import PersonManager
@@ -1183,7 +1175,7 @@ class Member(TimeStampedModel):
     )
 
     # Internals
-    # objects = MemberManager()
+    objects = MemberManager()
 
     class Meta:
         unique_together = (
