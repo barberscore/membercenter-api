@@ -12,7 +12,6 @@ urlpatterns = [
     path('', lambda r: HttpResponseRedirect('admin/')),
     path('admin/', admin.site.urls),
     path('bhs/', include('apps.bhs.urls')),
-    # path('source/', include('apps.source.urls')),
     path('jwt/', include('rest_framework_jwt.urls')),
     path('log/', include('django_fsm_log.urls')),
     path('rq/', include('django_rq.urls')),
