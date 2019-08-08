@@ -1,8 +1,12 @@
+# Standard Library
+from datetime import date
+from uuid import UUID
+
+# Django
+from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.core.validators import URLValidator
-from django.core.exceptions import ValidationError
-from uuid import UUID
-from datetime import date
+
 
 def validate_bhs_id(value):
     if not 0 < value < 999999:  # Your conditions here

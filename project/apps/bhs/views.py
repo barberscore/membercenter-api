@@ -4,21 +4,24 @@ import logging
 
 # Third-Party
 import pydf
-from rest_framework_json_api.filters import OrderingFilter
-from rest_framework_json_api.django_filters import DjangoFilterBackend
 from django_fsm import TransitionNotAllowed
 from django_fsm_log.models import StateLog
 from dry_rest_permissions.generics import DRYPermissions
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.negotiation import BaseContentNegotiation
 from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_json_api.django_filters import DjangoFilterBackend
+from rest_framework_json_api.filters import OrderingFilter
 
 # Django
 from django.core.files.base import ContentFile
-from django.db.models import Sum, Q, Avg
+from django.db.models import Avg
+from django.db.models import Q
+from django.db.models import Sum
 from django.template.loader import render_to_string
 from django.utils.text import slugify
 
@@ -27,27 +30,22 @@ from .filtersets import GroupFilterset
 from .filtersets import MemberFilterset
 from .filtersets import OfficerFilterset
 from .filtersets import PersonFilterset
-
 from .models import Group
 from .models import Member
 from .models import Officer
 from .models import Person
-
 from .renderers import PDFRenderer
 from .renderers import XLSXRenderer
 from .responders import PDFResponse
 from .responders import XLSXResponse
-
 from .serializers import GroupSerializer
 from .serializers import MemberSerializer
 from .serializers import OfficerSerializer
 from .serializers import PersonSerializer
 
-
 log = logging.getLogger(__name__)
 
 
-from rest_framework.negotiation import BaseContentNegotiation
 
 class IgnoreClientContentNegotiation(BaseContentNegotiation):
     def select_parser(self, request, parsers):
@@ -299,4 +297,3 @@ class PersonViewSet(viewsets.ModelViewSet):
         object.save()
         serializer = self.get_serializer(object)
         return Response(serializer.data)
-

@@ -2,20 +2,17 @@
 # Third-Party
 import pytest
 from rest_framework.test import APIClient
-# from rest_framework.test import RequestsClient
 
 # Django
 from django.test.client import Client
 
-# First-Party
-
+# Local
 from .factories import AwardFactory
 from .factories import ChartFactory
 from .factories import ConventionFactory
 from .factories import GroupFactory
 from .factories import PersonFactory
 from .factories import UserFactory
-
 
 
 @pytest.fixture

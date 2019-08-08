@@ -1,7 +1,8 @@
-from django.core.management.base import BaseCommand
-
 # Third-Party
 import requests
+
+# Django
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):

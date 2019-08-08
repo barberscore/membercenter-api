@@ -3,11 +3,9 @@
 from django.contrib import admin
 
 # Local
-
+from .models import Group
 from .models import Member
 from .models import Officer
-from .models import Group
-
 
 
 class MemberInline(admin.TabularInline):

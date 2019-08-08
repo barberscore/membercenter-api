@@ -1,18 +1,16 @@
 
 # Third-Party
 from dry_rest_permissions.generics import DRYPermissionsField
+from rest_framework.serializers import SerializerMethodField
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework_json_api import serializers
-from rest_framework.serializers import SerializerMethodField
 
 # Local
 from .fields import TimezoneField
-
 from .models import Group
 from .models import Member
 from .models import Officer
 from .models import Person
-
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -196,4 +194,3 @@ class PersonSerializer(serializers.ModelSerializer):
             # 'current_status',
             # 'current_district',
         ]
-

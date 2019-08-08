@@ -1,10 +1,8 @@
-
-
-
 # Standard Library
 import datetime
-import rest_framework_jwt
+
 # Third-Party
+import rest_framework_jwt
 from factory import Faker  # post_generation,
 from factory import Iterator
 from factory import LazyAttribute
@@ -15,23 +13,19 @@ from factory import SubFactory
 from factory.django import DjangoModelFactory
 from factory.django import mute_signals
 from factory.fuzzy import FuzzyInteger
-
-# Django
-from django.db.models.signals import pre_delete
-from django.db.models.signals import pre_save
-from django.db.models.signals import m2m_changed
-
-# First-Party
-
-
-from apps.bhs.models import Award
-from apps.bhs.models import Chart
-from apps.bhs.models import Group
-from apps.bhs.models import Person
-from apps.bhs.models import Convention
-
 from rest_framework_jwt.models import User
 
+# Django
+from django.db.models.signals import m2m_changed
+from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_save
+
+# First-Party
+from apps.bhs.models import Award
+from apps.bhs.models import Chart
+from apps.bhs.models import Convention
+from apps.bhs.models import Group
+from apps.bhs.models import Person
 
 
 class AwardFactory(DjangoModelFactory):

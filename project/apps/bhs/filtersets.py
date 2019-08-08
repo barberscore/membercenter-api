@@ -1,5 +1,5 @@
-from django_filters.rest_framework import FilterSet
 # Third-Party
+from django_filters.rest_framework import FilterSet
 
 # Local
 from .models import Group

@@ -1,14 +1,21 @@
+# Standard Library
 import os
 import string
 from datetime import date
+
+# Third-Party
 import phonenumbers
-import six
 import pytz
-from django.db.models import EmailField, CharField, DateField
-from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
-from django.utils.deconstruct import deconstructible
+import six
 from rest_framework_json_api import serializers
+
+# Django
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
+from django.db.models import CharField
+from django.db.models import DateField
+from django.db.models import EmailField
+from django.utils.deconstruct import deconstructible
 
 
 class ValidatedPhoneField(CharField):

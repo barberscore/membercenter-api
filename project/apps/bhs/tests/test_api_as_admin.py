@@ -62,4 +62,3 @@ def test_person_endpoint(admin_api_client, person, django_assert_max_num_queries
         path = reverse('person-detail', args=(str(person.id),))
         response = admin_api_client.get(path)
         assert response.status_code == status.HTTP_200_OK
-

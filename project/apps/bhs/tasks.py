@@ -1,5 +1,9 @@
+# Third-Party
 from django_rq import job
+
+# Django
 from django.apps import apps
+
 
 @job('low')
 def create_or_update_group_from_structure(structure):

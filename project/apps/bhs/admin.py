@@ -1,21 +1,18 @@
+# Third-Party
 from django_fsm_log.admin import StateLogInline
 from fsm_admin.mixins import FSMTransitionMixin
-
+from reversion.admin import VersionAdmin
 
 # Django
 from django.contrib import admin
-from reversion.admin import VersionAdmin
+
 # Local
-
-
-from .models import Person
+from .inlines import MemberInline
+from .inlines import OfficerInline
 from .models import Group
 from .models import Member
 from .models import Officer
-
-from .inlines import MemberInline
-from .inlines import OfficerInline
-
+from .models import Person
 
 admin.site.disable_action('delete_selected')
 

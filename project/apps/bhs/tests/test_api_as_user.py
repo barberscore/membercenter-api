@@ -52,4 +52,3 @@ def test_person_endpoint(user_api_client, person):
     path = reverse('person-detail', args=(str(person.id),))
     response = user_api_client.get(path)
     assert response.status_code == status.HTTP_200_OK
-
