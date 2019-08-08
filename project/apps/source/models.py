@@ -5,7 +5,7 @@ from model_utils import Choices
 from django.core.exceptions import ValidationError
 from django.db import models
 
-# First-Party
+# Local
 from .managers import HumanManager
 from .managers import JoinManager
 from .managers import RoleManager

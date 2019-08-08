@@ -2,18 +2,17 @@
 from django.contrib import admin
 
 # Local
+from .inlines import JoinInline
+from .inlines import RoleInline
+from .inlines import StructureInline
+from .inlines import SubscriptionInline
+from .models import Address
 from .models import Human
 from .models import Join
 from .models import Membership
 from .models import Role
 from .models import Structure
 from .models import Subscription
-from .models import Address
-
-from .inlines import JoinInline
-from .inlines import RoleInline
-from .inlines import SubscriptionInline
-from .inlines import StructureInline
 
 
 class ReadOnlyAdmin(admin.ModelAdmin):

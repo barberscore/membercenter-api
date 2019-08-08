@@ -1,22 +1,21 @@
+# Standard Library
 from datetime import date
-
-# Third-Party
 
 # Django
 from django.apps import apps
-from django.db.models import Manager
-from django.db.models import Q
-from django.db.models import F
-from django.db.models import Min
-from django.db.models import Max
-from django.db.models import When
-from django.db.models import Subquery
-from django.db.models import OuterRef
-from django.db.models import CharField
-from django.db.models import IntegerField
-from django.db.models import DateField
-from django.db.models import Case
 from django.contrib.auth import get_user_model
+from django.db.models import Case
+from django.db.models import CharField
+from django.db.models import DateField
+from django.db.models import F
+from django.db.models import IntegerField
+from django.db.models import Manager
+from django.db.models import Max
+from django.db.models import Min
+from django.db.models import OuterRef
+from django.db.models import Q
+from django.db.models import Subquery
+from django.db.models import When
 
 User = get_user_model()
 
