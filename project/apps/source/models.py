@@ -1,5 +1,4 @@
 # Django
-from django.core.exceptions import ValidationError
 from django.db import models
 
 # Local
@@ -582,13 +581,6 @@ class Role(models.Model):
             self.structure,
         )
 
-    def clean(self):
-        if self.name.partition(" ")[0].lower() != self.structure.kind:
-            raise ValidationError({
-                'name': 'Role name does not match structure type.',
-            })
-
-
     class Meta:
         managed = False
         db_table = 'vwOfficers'
@@ -665,16 +657,6 @@ class Join(models.Model):
     # FKs
 
     # Internals
-    def clean(self):
-        if all([
-            not self.inactive_date,
-            self.subscription.items_editable,
-            self.subscription.status == 'expired',
-        ]):
-            raise ValidationError({
-                'inactive_date': 'Inactive Date is missing on expired subscription.',
-            })
-
     def __str__(self):
         return str(self.id)
 
