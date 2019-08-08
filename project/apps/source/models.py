@@ -60,10 +60,11 @@ class Human(models.Model):
         db_column='updated',
         editable=False,
     )
-    updated_by_id = models.CharField(
+    modified_by_id = models.CharField(
         max_length=36,
         null=True,
         editable=False,
+        db_column='updated_by_id',
     )
     deleted = models.DateTimeField(
         db_column='deleted',
@@ -74,7 +75,6 @@ class Human(models.Model):
         null=True,
         editable=False,
     )
-
     home_phone = models.CharField(
         max_length=20,
         editable=False,
@@ -212,9 +212,10 @@ class Structure(models.Model):
         db_column='updated',
         editable=False,
     )
-    updated_by_id = models.CharField(
+    modified_by_id = models.CharField(
         max_length=36,
         editable=False,
+        db_column='updated_by_id',
     )
     deleted = models.DateTimeField(
         db_column='deleted',
