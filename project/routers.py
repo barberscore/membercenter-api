@@ -3,31 +3,13 @@ class SourceRouter(object):
 
     def db_for_read(self, model, **hints):
         """Attempt to read bhs models go to source_db, otherwise to default."""
-        models = [
-            'source.human',
-            'source.structure',
-            'source.status',
-            'source.membership',
-            'source.subscription',
-            'source.role',
-            'source.join',
-        ]
-        if model._meta.label_lower in models:
+        if model._meta.app_label == 'source':
             return 'source_db'
         return None
 
     def db_for_write(self, model, **hints):
         """Attempt to write bhs models go to source_db, otherwise to default."""
-        models = [
-            'source.human',
-            'source.structure',
-            'source.status',
-            'source.membership',
-            'source.subscription',
-            'source.role',
-            'source.join',
-        ]
-        if model._meta.label_lower in models:
+        if model._meta.app_label == 'source':
             return 'source_db'
         return None
 
@@ -35,6 +17,7 @@ class SourceRouter(object):
         """Reject relations if a model in the bhs app is involved."""
         models = [
             'source.human',
+            'source.address',
             'source.structure',
             'source.status',
             'source.membership',
@@ -42,21 +25,12 @@ class SourceRouter(object):
             'source.role',
             'source.join',
         ]
-        if (obj1._meta.label_lower in models) and (obj2._meta.label_lower not in models):
+        if (obj1._meta.app_label == 'source') and (obj2._meta.app_label != 'source'):
             return False
         return None
 
     def allow_migrate(self, db, app_label, model_name=None, **hints):
         """Make sure the bhs app only appears in the 'source_db' database."""
-        models = [
-            'human',
-            'structure',
-            'status',
-            'membership',
-            'subscription',
-            'role',
-            'join',
-        ]
-        if app_label == 'source' and model_name in models:
+        if app_label == 'source':
             return False
         return None

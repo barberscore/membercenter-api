@@ -12,90 +12,100 @@ from .managers import RoleManager
 from .managers import StructureManager
 
 
-
 class Human(models.Model):
     id = models.CharField(
         primary_key=True,
-        max_length=255,
+        max_length=36,
+        editable=False,
+    )
+    username = models.CharField(
+        max_length=60,
         editable=False,
     )
     first_name = models.CharField(
-        max_length=255,
+        max_length=45,
         editable=False,
     )
     middle_name = models.CharField(
-        max_length=255,
+        max_length=45,
         editable=False,
         db_column='middle_initial',
     )
     last_name = models.CharField(
-        max_length=255,
+        max_length=45,
         editable=False,
     )
     nick_name = models.CharField(
-        max_length=255,
+        max_length=45,
         editable=False,
         db_column='preferred_name',
     )
     email = models.CharField(
         max_length=255,
         editable=False,
-        null=True,
-        db_column='username',
     )
-    birth_date = models.CharField(
-        max_length=255,
+    birth_date = models.DateField(
         editable=False,
-        null=True,
         db_column='birthday'
     )
+    is_deceased = models.BooleanField(
+        editable=False,
+    )
+    created = models.DateTimeField(
+        db_column='created',
+        editable=False,
+    )
+    created_by_id = models.CharField(
+        max_length=36,
+        null=True,
+        editable=False,
+    )
+    modified = models.DateTimeField(
+        db_column='updated',
+        editable=False,
+    )
+    updated_by_id = models.CharField(
+        max_length=36,
+        null=True,
+        editable=False,
+    )
+    deleted = models.DateTimeField(
+        db_column='deleted',
+        editable=False,
+    )
+    deleted_by_id = models.CharField(
+        max_length=36,
+        null=True,
+        editable=False,
+    )
+
     home_phone = models.CharField(
-        max_length=255,
+        max_length=20,
         editable=False,
         db_column='phone'
     )
     cell_phone = models.CharField(
-        max_length=255,
+        max_length=20,
         editable=False,
     )
     work_phone = models.CharField(
-        max_length=255,
+        max_length=20,
         editable=False,
     )
     bhs_id = models.IntegerField(
         editable=False,
         unique=True,
-        null=True,
         db_column='legacy_id',
     )
-    GENDER = Choices(
-        ('male', 'Male'),
-        ('female', 'Female'),
-    )
     gender = models.CharField(
-        max_length=255,
+        max_length=15,
         editable=False,
-        choices=GENDER,
         db_column='sex',
     )
-    PART = Choices(
-        ('tenor', 'Tenor'),
-        ('lead', 'Lead'),
-        ('baritone', 'Baritone'),
-        ('bass', 'Bass'),
-    )
     part = models.CharField(
-        max_length=255,
+        max_length=10,
         editable=False,
-        choices=PART,
         db_column='primary_voice_part',
-    )
-    mon = models.IntegerField(
-        editable=False,
-        db_column='trusted_mon',
-    )
-    is_deceased = models.BooleanField(
-        editable=False,
     )
     is_honorary = models.BooleanField(
         editable=False,
@@ -104,32 +114,19 @@ class Human(models.Model):
     is_suspended = models.BooleanField(
         editable=False,
     )
-    is_expelled = models.BooleanField(
-        editable=False,
-    )
     merged_id = models.CharField(
-        max_length=255,
+        max_length=36,
         null=True,
         editable=False,
         db_column='merged_into',
     )
-    deleted_id = models.CharField(
-        max_length=255,
-        null=True,
+    mon = models.IntegerField(
         editable=False,
-        db_column='deleted_by_id',
+        db_column='trusted_mon',
     )
-    created = models.DateTimeField(
-        db_column='created',
-        null=True,
+    is_expelled = models.BooleanField(
         editable=False,
     )
-    modified = models.DateTimeField(
-        db_column='updated',
-        null=True,
-        editable=False,
-    )
-
     objects = HumanManager()
 
     # Internals
@@ -145,94 +142,37 @@ class Human(models.Model):
 
     # Methods
     class Meta:
-        managed=False
+        managed = False
         db_table = 'vwMembers'
 
 
 class Structure(models.Model):
     id = models.CharField(
         primary_key=True,
-        max_length=255,
+        max_length=36,
         editable=False,
     )
     name = models.CharField(
-        max_length=255,
+        max_length=100,
         editable=False,
-    )
-    KIND = Choices(
-        ('organization', 'Organization'),
-        ('district', 'District'),
-        ('group', 'Group'),
-        ('chapter', 'Chapter'),
-        ('chorus', 'Chorus'),
-        ('quartet', 'Quartet'),
     )
     kind = models.CharField(
-        max_length=255,
+        max_length=15,
         editable=False,
-        choices=KIND,
         db_column='object_type',
     )
-    GENDER = Choices(
-        ('men', 'Male'),
-        ('women', 'Female'),
-        ('mixed', 'Mixed'),
-    )
     gender = models.CharField(
-        max_length=255,
+        max_length=100,
         editable=False,
-        choices=GENDER,
         db_column='category'
     )
-    DIVISION = Choices(
-        ('EVG', [
-            'EVG Division I',
-            'EVG Division II',
-            'EVG Division III',
-            'EVG Division IV',
-            'EVG Division V',
-        ]),
-        ('FWD', [
-            'FWD Arizona',
-            'FWD Northeast',
-            'FWD Northwest',
-            'FWD Southeast',
-            'FWD Southwest',
-        ]),
-        ('LOL', [
-            'LOL 10000 Lakes',
-            'LOL Division One',
-            'LOL Northern Plains',
-            'LOL Packerland',
-            'LOL Southwest',
-        ]),
-        ('MAD', [
-            # (160, 'madatl', 'MAD Atlantic'),
-            'MAD Central',
-            'MAD Northern',
-            'MAD Southern',
-            # (200, 'madwst', 'MAD Western'),
-        ]),
-        ('NED', [
-            'NED Granite and Pine',
-            'NED Mountain',
-            'NED Patriot',
-            'NED Sunrise',
-            'NED Yankee',
-        ]),
-        ('SWD', [
-            'SWD Northeast',
-            'SWD Northwest',
-            'SWD Southeast',
-            'SWD Southwest',
-        ]),
-    )
-    division = models.CharField(
-        max_length=255,
+    county = models.CharField(
+        max_length=45,
         editable=False,
-        null=True,
-        db_column='division',
-        choices=DIVISION,
+    )
+    country = models.CharField(
+        max_length=45,
+        editable=False,
     )
     bhs_id = models.IntegerField(
         editable=False,
@@ -241,27 +181,66 @@ class Structure(models.Model):
         db_column='legacy_id',
     )
     chapter_code = models.CharField(
-        max_length=255,
+        max_length=45,
         editable=False,
         db_column='legacy_code',
+    )
+    chorus_name = models.CharField(
+        max_length=45,
+        editable=False,
     )
     website = models.CharField(
         max_length=255,
         editable=False,
     )
-    email = models.CharField(
-        max_length=255,
+    tin = models.CharField(
+        max_length=18,
+        editable=False,
+        db_column='TIN',
+    )
+    established_date = models.DateField(
         editable=False,
     )
-    chorus_name = models.CharField(
-        max_length=255,
+    visitor_information = models.TextField(
+        editable=False,
+    )
+    created = models.DateTimeField(
+        db_column='created',
+        editable=False,
+    )
+    created_by_id = models.CharField(
+        max_length=36,
+        editable=False,
+    )
+    modified = models.DateTimeField(
+        db_column='updated',
+        editable=False,
+    )
+    updated_by_id = models.CharField(
+        max_length=36,
+        editable=False,
+    )
+    deleted = models.DateTimeField(
+        db_column='deleted',
+        editable=False,
+    )
+    deleted_by_id = models.CharField(
+        max_length=36,
         editable=False,
     )
     phone = models.CharField(
-        max_length=255,
+        max_length=16,
+        editable=False,
+    )
+    phone_ext = models.CharField(
+        max_length=16,
         editable=False,
     )
     fax = models.CharField(
+        max_length=16,
+        editable=False,
+    )
+    email = models.CharField(
         max_length=255,
         editable=False,
     )
@@ -293,64 +272,53 @@ class Structure(models.Model):
         max_length=255,
         editable=False,
     )
-    tin = models.CharField(
-        max_length=18,
-        editable=False,
-    )
     preferred_name = models.CharField(
-        max_length=255,
+        max_length=128,
         editable=False,
     )
     first_alternate_name = models.CharField(
-        max_length=255,
+        max_length=128,
         editable=False,
     )
     second_alternate_name = models.CharField(
+        max_length=128,
+        editable=False,
+    )
+    is_default = models.BooleanField(
+        editable=False,
+    )
+    parent = models.ForeignKey(
+        'self',
+        null=True,
+        related_name='children',
+        db_column='parent_id',
+        on_delete=models.SET_NULL,
+    )
+    division = models.CharField(
         max_length=255,
         editable=False,
     )
-    visitor_information = models.TextField(
+    status = models.ForeignKey(
+        'Status',
+        related_name='structures',
+        null=True,
         editable=False,
+        on_delete=models.SET_NULL,
     )
-    established_date = models.DateField(
+    licenced_date = models.DateField(
         editable=False,
     )
     chartered_date = models.DateField(
         editable=False,
     )
-    licenced_date = models.DateField(
+    lft = models.IntegerField(
         editable=False,
     )
-    deleted_id = models.CharField(
-        max_length=255,
-        null=True,
+    rght = models.IntegerField(
         editable=False,
-        db_column='deleted_by_id',
-    )
-    created = models.DateTimeField(
-        db_column='created',
-        editable=False,
-    )
-    modified = models.DateTimeField(
-        db_column='updated',
-        editable=False,
-    )
-    # FKs
-    status = models.ForeignKey(
-        'Status',
-        related_name='structures',
-        # editable=False,
-        on_delete=models.CASCADE,
-    )
-    parent = models.ForeignKey(
-        'self',
-        null=True,
-        blank=True,
-        related_name='children',
-        db_column='parent_id',
-        on_delete=models.CASCADE,
     )
 
+    # FKs
     objects = StructureManager()
 
     def __str__(self):
@@ -365,7 +333,7 @@ class Structure(models.Model):
 
 
     class Meta:
-        managed=False
+        managed = False
         db_table = 'vwStructures'
 
 
@@ -376,15 +344,32 @@ class Status(models.Model):
         editable=False,
     )
     name = models.CharField(
-        max_length=255,
+        max_length=36,
         editable=False,
     )
+    label = models.CharField(
+        max_length=36,
+        editable=False,
+    )
+    non_admin_view = models.BooleanField(
+        editable=False,
+    )
+    non_admin_join = models.BooleanField(
+        editable=False,
+    )
+    renewable = models.BooleanField(
+        editable=False,
+    )
+    entities = models.TextField(
+        editable=False,
+    )
+
     # Internals
     def __str__(self):
         return str(self.name)
 
     class Meta:
-        managed=False
+        managed = False
         db_table = 'vwStatuses'
         verbose_name_plural = 'statuses'
 
@@ -395,40 +380,68 @@ class Membership(models.Model):
         max_length=255,
         editable=False,
     )
-
-    code = models.CharField(
-        max_length=255,
+    object_type = models.CharField(
+        max_length=36,
         editable=False,
     )
-
+    months = models.IntegerField(
+        editable=False,
+    )
+    structure = models.ForeignKey(
+        'Structure',
+        related_name='memberships',
+        null=True,
+        editable=False,
+        db_column='object_id',
+        on_delete=models.SET_NULL,
+    )
+    months = models.IntegerField(
+        editable=False,
+    )
+    is_auto_renew = models.BooleanField(
+        default=False,
+        db_column='auto_renew',
+    )
+    type = models.CharField(
+        max_length=36,
+        editable=False,
+    )
+    code = models.CharField(
+        max_length=4,
+        editable=False,
+    )
+    membership_options_id = models.CharField(
+        max_length=36,
+        editable=False,
+    )
+    effective_date = models.DateField(
+        editable=False,
+    )
     created = models.DateTimeField(
         db_column='created',
         editable=False,
     )
+    created_by_id = models.CharField(
+        max_length=36,
+        editable=False,
+    )
+    deleted = models.DateTimeField(
+        db_column='deleted',
+        editable=False,
+    )
+    deleted_by_id = models.CharField(
+        max_length=36,
+        editable=False,
+    )
     modified = models.DateTimeField(
-        db_column='modified',
         editable=False,
-    )
-    deleted_id = models.CharField(
-        max_length=255,
-        null=True,
-        editable=False,
-        db_column='deleted_by_id',
-    )
-
-    # FKs
-    structure = models.ForeignKey(
-        'Structure',
-        related_name='memberships',
-        editable=False,
-        db_column='object_id',
-        on_delete=models.CASCADE,
     )
     status = models.ForeignKey(
         'Status',
         related_name='memberships',
+        null=True,
         editable=False,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
     )
 
     # Internals
@@ -439,7 +452,7 @@ class Membership(models.Model):
         )
 
     class Meta:
-        managed=False
+        managed = False
         db_table = 'vwMemberships'
 
 
@@ -449,13 +462,41 @@ class Subscription(models.Model):
         max_length=255,
         editable=False,
     )
+    members_entities_id = models.CharField(
+        max_length=36,
+        editable=False,
+    )
+    modified = models.DateTimeField(
+        null=True,
+        editable=False,
+        db_column='updated',
+    )
     current_through = models.DateField(
         db_column='valid_through',
         null=True,
         editable=False,
     )
+    memberships_id = models.CharField(
+        max_length=36,
+        editable=False,
+    )
+    created = models.DateTimeField(
+        null=True,
+        editable=False,
+    )
     status = models.CharField(
-        max_length=255,
+        max_length=36,
+        editable=False,
+    )
+    human = models.ForeignKey(
+        'Human',
+        related_name='subscriptions',
+        editable=False,
+        db_column='members_id',
+        on_delete=models.CASCADE,
+    )
+    join_date = models.DateField(
+        null=True,
         editable=False,
     )
     items_editable = models.BooleanField(
@@ -465,25 +506,6 @@ class Subscription(models.Model):
         null=True,
         editable=False,
         db_column='deleted',
-    )
-    created = models.DateTimeField(
-        null=True,
-        editable=False,
-        db_column='created',
-    )
-    modified = models.DateTimeField(
-        null=True,
-        editable=False,
-        db_column='updated',
-    )
-
-    # FKs
-    human = models.ForeignKey(
-        'Human',
-        related_name='subscriptions',
-        editable=False,
-        db_column='members_id',
-        on_delete=models.CASCADE,
     )
 
     # Internals
@@ -501,16 +523,27 @@ class Role(models.Model):
         max_length=255,
         editable=False,
     )
+    object_type = models.CharField(
+        max_length=32,
+        editable=False,
+    )
+    structure = models.ForeignKey(
+        'Structure',
+        related_name='roles',
+        editable=False,
+        db_column='object_id',
+        on_delete=models.CASCADE,
+    )
+    officer_roles_id = models.CharField(
+        max_length=36,
+        editable=False,
+    )
     name = models.CharField(
-        max_length=255,
+        max_length=100,
         editable=False,
     )
     abbv = models.CharField(
-        max_length=255,
-        editable=False,
-    )
-    officer_roles_id = models.CharField(
-        max_length=255,
+        max_length=10,
         editable=False,
     )
     start_date = models.DateField(
@@ -525,16 +558,10 @@ class Role(models.Model):
     human = models.ForeignKey(
         'Human',
         related_name='roles',
+        null=True,
         editable=False,
         db_column='member_id',
-        on_delete=models.CASCADE,
-    )
-    structure = models.ForeignKey(
-        'Structure',
-        related_name='roles',
-        editable=False,
-        db_column='object_id',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
     )
 
     created = models.DateTimeField(
@@ -566,7 +593,7 @@ class Role(models.Model):
 
 
     class Meta:
-        managed=False
+        managed = False
         db_table = 'vwOfficers'
 
 
@@ -576,57 +603,6 @@ class Join(models.Model):
         max_length=255,
         editable=False,
     )
-    status = models.BooleanField(
-        editable=False,
-    )
-    paid = models.BooleanField(
-        editable=False,
-    )
-    PART = Choices(
-        ('tenor', 'Tenor'),
-        ('lead', 'Lead'),
-        ('baritone', 'Baritone'),
-        ('bass', 'Bass'),
-    )
-    part = models.CharField(
-        max_length=255,
-        editable=False,
-        choices=PART,
-        db_column='vocal_part',
-    )
-    established_date = models.DateField(
-        db_column='created',
-        null=True,
-        editable=False,
-    )
-    inactive_date = models.DateField(
-        db_column='inactive',
-        null=True,
-        editable=False,
-    )
-    inactive_reason = models.CharField(
-        max_length=255,
-        db_column='inactive_reason',
-        editable=False,
-    )
-    deleted = models.DateTimeField(
-        null=True,
-        editable=False,
-        db_column='deleted',
-    )
-    created = models.DateTimeField(
-        db_column='created_on',
-        null=True,
-        editable=False,
-    )
-    modified = models.DateTimeField(
-        db_column='modified',
-        null=True,
-        editable=False,
-    )
-    objects = JoinManager()
-
-    # FKs
     subscription = models.ForeignKey(
         'Subscription',
         editable=False,
@@ -639,6 +615,32 @@ class Join(models.Model):
         related_name='joins',
         on_delete=models.CASCADE,
     )
+    status = models.BooleanField(
+        editable=False,
+    )
+    established_date = models.DateField(
+        db_column='created',
+        null=True,
+        editable=False,
+    )
+    inactive_date = models.DateField(
+        db_column='inactive',
+        null=True,
+        editable=False,
+    )
+    inactive_reason = models.CharField(
+        max_length=50,
+        db_column='inactive_reason',
+        editable=False,
+    )
+    paid = models.BooleanField(
+        editable=False,
+    )
+    part = models.CharField(
+        max_length=10,
+        editable=False,
+        db_column='vocal_part',
+    )
     structure = models.ForeignKey(
         'Structure',
         editable=False,
@@ -646,6 +648,24 @@ class Join(models.Model):
         db_column='reference_structure_id',
         on_delete=models.CASCADE,
     )
+    modified = models.DateTimeField(
+        db_column='modified',
+        null=True,
+        editable=False,
+    )
+    created = models.DateTimeField(
+        db_column='created_on',
+        null=True,
+        editable=False,
+    )
+    deleted = models.DateTimeField(
+        null=True,
+        editable=False,
+        db_column='deleted',
+    )
+    objects = JoinManager()
+
+    # FKs
 
     # Internals
     def clean(self):
@@ -666,3 +686,79 @@ class Join(models.Model):
         db_table = 'vwSubscriptions_Memberships'
         verbose_name = 'Join'
         verbose_name_plural = 'Joins'
+
+
+class Address(models.Model):
+    id = models.CharField(
+        primary_key=True,
+        max_length=36,
+        editable=False,
+    )
+    name = models.CharField(
+        max_length=75,
+        editable=False,
+    )
+    object_type = models.CharField(
+        max_length=36,
+        editable=False,
+    )
+    object_id = models.CharField(
+        max_length=36,
+        editable=False,
+    )
+    kind = models.CharField(
+        max_length=36,
+        editable=False,
+        db_column='type',
+    )
+    city = models.CharField(
+        max_length=128,
+        editable=False,
+    )
+    state = models.CharField(
+        max_length=64,
+        editable=False,
+    )
+    country = models.CharField(
+        max_length=32,
+        editable=False,
+    )
+    status = models.BooleanField(
+        editable=False,
+    )
+    updated = models.DateTimeField(
+        null=True,
+        editable=False,
+    )
+    modified = models.DateTimeField(
+        null=True,
+        editable=False,
+    )
+    created = models.DateTimeField(
+        null=True,
+        editable=False,
+    )
+    lat = models.FloatField(
+        null=True,
+        editable=False,
+    )
+    lon = models.FloatField(
+        null=True,
+        editable=False,
+    )
+    legacy_id = models.IntegerField(
+        editable=False,
+    )
+    deleted = models.DateTimeField(
+        null=True,
+        editable=False,
+    )
+
+    def __str__(self):
+        return str(self.id)
+
+    class Meta:
+        managed = False
+        db_table = 'vwAddresses'
+        verbose_name = 'Address'
+        verbose_name_plural = 'Addresses'

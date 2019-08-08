@@ -8,6 +8,7 @@ from .models import Membership
 from .models import Role
 from .models import Structure
 from .models import Subscription
+from .models import Address
 
 from .inlines import JoinInline
 from .inlines import RoleInline
@@ -454,6 +455,87 @@ class JoinAdmin(ReadOnlyAdmin):
     search_fields = [
         'subscription__human__last_name',
         'subscription__human__bhs_id',
+        # 'membership__structure__name',
+        # 'membership__structure__bhs_id',
+    ]
+
+
+@admin.register(Address)
+class AddressAdmin(ReadOnlyAdmin):
+    fields = [
+        'id',
+        'name',
+        'object_type',
+        'object_id',
+        'kind',
+        'city',
+        'state',
+        'country',
+        'status',
+        'updated',
+        'modified',
+        'created',
+        'lat',
+        'lon',
+        'legacy_id',
+        'deleted',
+    ]
+
+    list_display = [
+        'id',
+        'name',
+        'object_type',
+        'object_id',
+        'kind',
+        'city',
+        'state',
+        'country',
+        'status',
+        'updated',
+        'modified',
+        'created',
+        'lat',
+        'lon',
+        'legacy_id',
+        'deleted',
+    ]
+
+    list_select_related = [
+        # 'subscription',
+        # 'membership',
+    ]
+    readonly_fields = [
+        'id',
+        'name',
+        'object_type',
+        'object_id',
+        'kind',
+        'city',
+        'state',
+        'country',
+        'status',
+        'updated',
+        'modified',
+        'created',
+        'lat',
+        'lon',
+        'legacy_id',
+        'deleted',
+    ]
+
+    list_display_links = [
+        # 'id',
+    ]
+
+    list_filter = [
+        'object_type',
+        'kind',
+        'status',
+    ]
+
+    search_fields = [
+        # 'subscription__human__last_name',
+        # 'subscription__human__bhs_id',
         # 'membership__structure__name',
         # 'membership__structure__bhs_id',
     ]
