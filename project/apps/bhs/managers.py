@@ -10,6 +10,8 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.db.models import Manager
+from django.core.validators import validate_email
+from .validators import validate_url
 
 User = get_user_model()
 
@@ -85,17 +87,43 @@ class PersonManager(Manager):
         if nick_name == first_name:
             nick_name = ""
 
+        if first_name:
+            first_name.translate(
+                first_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
+            ).strip()
+
+        if middle_name:
+            middle_name.translate(
+                middle_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
+            ).strip()
+
+        if last_name:
+            last_name.translate(
+                last_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
+            ).strip()
+
+        if nick_name:
+            nick_name.translate(
+                nick_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
+            ).strip()
+
         try:
             validate_international_phonenumber(home_phone)
         except ValidationError:
+            home_phone = ""
+        if not home_phone:
             home_phone = ""
         try:
             validate_international_phonenumber(cell_phone)
         except ValidationError:
             cell_phone = ""
+        if not cell_phone:
+            cell_phone = ""
         try:
             validate_international_phonenumber(work_phone)
         except ValidationError:
+            work_phone = ""
+        if not work_phone:
             work_phone = ""
 
         if gender:
@@ -108,19 +136,20 @@ class PersonManager(Manager):
             part = None
 
         try:
-            validate_international_phonenumber(home_phone)
+            validate_email(email)
         except ValidationError:
-            home_phone = ""
+            email = ''
+        if email:
+            email = email.lower()
 
-        try:
-            validate_international_phonenumber(cell_phone)
-        except ValidationError:
-            cell_phone = ""
-
-        try:
-            validate_international_phonenumber(work_phone)
-        except ValidationError:
-            work_phone = ""
+        if not first_name:
+            first_name = ""
+        if not middle_name:
+            middle_name = ""
+        if not last_name:
+            last_name = ""
+        if not nick_name:
+            nick_name = ""
 
         is_deceased = bool(is_deceased)
 
@@ -146,7 +175,7 @@ class PersonManager(Manager):
         }
         # Update or create
         person, created = self.update_or_create(
-            mc_pk=mc_pk,
+            id=mc_pk,
             defaults=defaults,
         )
         return person, created
@@ -154,9 +183,9 @@ class PersonManager(Manager):
     def delete_orphans(self, humans):
         # Delete Orphans
         orphans = self.filter(
-            mc_pk__isnull=False,
+            id__isnull=False,
         ).exclude(
-            mc_pk__in=humans,
+            id__in=humans,
         )
         t = orphans.count()
         orphans.delete()
@@ -411,7 +440,7 @@ class GroupManager(Manager):
 
         if parent_pk:
             parent = self.get(
-                mc_pk=parent_pk,
+                id=parent_pk,
             )
         else:
             parent = None
@@ -477,9 +506,14 @@ class GroupManager(Manager):
             'parent': parent,
         }
 
+        try:
+            validate_url(website)
+        except ValidationError:
+            website = ''
+
         # Load
         group, created = self.update_or_create(
-            mc_pk=mc_pk,
+            id=mc_pk,
             defaults=defaults,
         )
         return group, created
@@ -487,9 +521,9 @@ class GroupManager(Manager):
     def delete_orphans(self, structures):
         # Delete Orphans
         orphans = self.filter(
-            mc_pk__isnull=False,
+            id__isnull=False,
         ).exclude(
-            mc_pk__in=structures,
+            id__in=structures,
         )
         t = orphans.count()
         orphans.delete()
@@ -540,7 +574,7 @@ class GroupManager(Manager):
         quartets = self.filter(
             kind=self.model.KIND.quartet,
             status__gt=0,
-            mc_pk__isnull=False,
+            id__isnull=False,
         )
 
         for quartet in quartets:
@@ -608,7 +642,7 @@ class OfficerManager(Manager):
         # Extract
         if not isinstance(role, dict):
             raise RuntimeError("Must be pre-processed")
-        mc_pk = role['id']
+        # mc_pk = role['id']
         # name = role['name']
         start_date = role['startest_date']
         end_date = role['endest_date']
@@ -621,14 +655,13 @@ class OfficerManager(Manager):
         Group = apps.get_model('bhs.group')
 
         defaults = {
-            'mc_pk': mc_pk,
             'status': status,
             'start_date': start_date,
             'end_date': end_date,
         }
 
-        person = Person.objects.get(mc_pk=person_pk)
-        group = Group.objects.get(mc_pk=group_pk)
+        person = Person.objects.get(id=person_pk)
+        group = Group.objects.get(id=group_pk)
         office = self.model.OFFICE.manager
 
         # Load
@@ -643,9 +676,9 @@ class OfficerManager(Manager):
     def delete_orphans(self, roles):
         # Delete Orphans
         orphans = self.filter(
-            mc_pk__isnull=False,
+            id__isnull=False,
         ).exclude(
-            mc_pk__in=roles,
+            id__in=roles,
         )
         t = orphans.count()
         orphans.delete()
@@ -660,7 +693,7 @@ class MemberManager(Manager):
         if not isinstance(join, dict):
             raise RuntimeError("Must be pre-validated")
 
-        mc_pk = join['id']
+        # mc_pk = join['id']
         start_date = join['startest_date']
         end_date = join['endest_date']
         vocal_part = join['vocal_part']
@@ -677,15 +710,14 @@ class MemberManager(Manager):
 
         # Build dictionary
         defaults = {
-            'mc_pk': mc_pk,
             'status': status,
             'start_date': start_date,
             'end_date': end_date,
             'part': part,
         }
 
-        person = Person.objects.get(mc_pk=person_pk)
-        group = Group.objects.get(mc_pk=group_pk)
+        person = Person.objects.get(id=person_pk)
+        group = Group.objects.get(id=group_pk)
 
         # Load
         member, created = self.update_or_create(
@@ -698,9 +730,9 @@ class MemberManager(Manager):
     def delete_orphans(self, joins):
         # Delete Orphans
         orphans = self.filter(
-            mc_pk__isnull=False,
+            id__isnull=False,
         ).exclude(
-            mc_pk__in=joins,
+            id__in=joins,
         )
         t = orphans.count()
         orphans.delete()

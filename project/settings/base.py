@@ -209,8 +209,8 @@ REST_FRAMEWORK = {
 }
 
 # JSONAPI
-JSON_API_FORMAT_FIELD_NAMES = 'dasherize'
-JSON_API_FORMAT_TYPES = 'dasherize'
+# JSON_API_FORMAT_FIELD_NAMES = 'dasherize'
+# JSON_API_FORMAT_TYPES = 'dasherize'
 JSON_API_PLURALIZE_TYPES = False
 
 # Phone Number

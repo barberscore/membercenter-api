@@ -16,7 +16,7 @@ from .models import Person
 class GroupSerializer(serializers.ModelSerializer):
     permissions = DRYPermissionsField()
     included_serializers = {
-        'repertories': 'apps.bhs.serializers.RepertorySerializer',
+        # 'repertories': 'apps.bhs.serializers.RepertorySerializer',
         # 'members': 'apps.bhs.serializers.MemberSerializer',
         # 'officers': 'apps.bhs.serializers.OfficerSerializer',
     }
@@ -53,8 +53,6 @@ class GroupSerializer(serializers.ModelSerializer):
             'participants',
             'chapters',
             'notes',
-            'mc_pk',
-
             'tree_sort',
 
             'is_senior',
@@ -65,7 +63,7 @@ class GroupSerializer(serializers.ModelSerializer):
             'parent',
             # 'children',
 
-            'repertories',
+            # 'repertories',
             'permissions',
 
             'nomen',
@@ -79,7 +77,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
     class JSONAPIMeta:
         included_resources = [
-            'repertories',
+            # 'repertories',
             # 'members',
             # 'officers',
         ]
@@ -168,9 +166,9 @@ class PersonSerializer(serializers.ModelSerializer):
             'description',
             'notes',
             'bhs_id',
-            'mc_pk',
 
             'nomen',
+            'name',
             'full_name',
             'common_name',
             'sort_name',
@@ -180,11 +178,12 @@ class PersonSerializer(serializers.ModelSerializer):
             # 'current_status',
             # 'current_district',
 
-            'user',
+            # 'user',
             'permissions',
         ]
         read_only_fields = [
             'nomen',
+            'name',
             'full_name',
             'common_name',
             'sort_name',

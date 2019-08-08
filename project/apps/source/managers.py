@@ -24,7 +24,7 @@ class HumanManager(Manager):
     def export_values(self, cursor=None):
         hs = self.filter(
             Q(merged_id="") | Q(merged_id=None),
-            Q(deleted_id="") | Q(deleted_id=None),
+            Q(deleted_by_id="") | Q(deleted_by_id=None),
         )
         if cursor:
             hs = hs.filter(
@@ -66,7 +66,7 @@ class StructureManager(Manager):
         for t in types:
             ss = self.filter(
                 Q(kind=t),
-                Q(deleted_id="") | Q(deleted_id=None),
+                Q(deleted_by_id="") | Q(deleted_by_id=None),
             )
             if cursor:
                 ss = ss.filter(
@@ -106,9 +106,9 @@ class RoleManager(Manager):
     def export_values(self, cursor=None):
         today = date.today()
         rs = self.filter(
-            Q(structure__deleted_id="") | Q(structure__deleted_id=None),
+            Q(structure__deleted_by_id="") | Q(structure__deleted_by_id=None),
             Q(human__merged_id="") | Q(human__merged_id=None),
-            Q(human__deleted_id="") | Q(human__deleted_id=None),
+            Q(human__deleted_by_id="") | Q(human__deleted_by_id=None),
         )
         if cursor:
             rs = rs.filter(
@@ -143,11 +143,11 @@ class JoinManager(Manager):
         ).filter(
             Q(paid=True),
             Q(deleted__isnull=True),
-            Q(membership__deleted_id="") | Q(membership__deleted_id=None),
+            Q(membership__deleted_by_id="") | Q(membership__deleted_by_id=None),
             Q(subscription__deleted=None),
-            Q(structure__deleted_id="") | Q(structure__deleted_id=None),
+            Q(structure__deleted_by_id="") | Q(structure__deleted_by_id=None),
             Q(subscription__human__merged_id="") | Q(subscription__human__merged_id=None),
-            Q(subscription__human__deleted_id="") | Q(subscription__human__deleted_id=None),
+            Q(subscription__human__deleted_by_id="") | Q(subscription__human__deleted_by_id=None),
         )
         if cursor:
             js = js.filter(

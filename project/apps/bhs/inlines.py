@@ -106,7 +106,6 @@ class ActiveChorusInline(admin.TabularInline):
         # 'kind',
         'gender',
         'status',
-        'mc_pk',
     ]
     fk_name = 'parent'
     ordering = [

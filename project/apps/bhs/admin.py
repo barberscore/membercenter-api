@@ -33,7 +33,7 @@ class GroupAdmin(VersionAdmin, FSMTransitionMixin):
         'division',
         'owners',
         ('is_senior', 'is_youth',),
-        ('bhs_id', 'mc_pk', 'code',),
+        ('bhs_id', 'code',),
         'parent',
         'location',
         'email',
@@ -180,7 +180,6 @@ class MemberAdmin(VersionAdmin, FSMTransitionMixin):
         'person',
         'group',
         'part',
-        'mc_pk',
         'start_date',
         'end_date',
         # 'inactive_date',
@@ -259,7 +258,6 @@ class OfficerAdmin(VersionAdmin, FSMTransitionMixin):
         'group',
         'start_date',
         'end_date',
-        'mc_pk'
     ]
 
     list_display = [
@@ -308,7 +306,6 @@ class PersonAdmin(VersionAdmin, FSMTransitionMixin):
         ('home_phone', 'work_phone', 'cell_phone',),
         ('part', 'gender',),
         ('is_deceased', 'is_honorary', 'is_suspended', 'is_expelled',),
-        'mc_pk',
         'spouse',
         'location',
         'representing',
@@ -349,7 +346,6 @@ class PersonAdmin(VersionAdmin, FSMTransitionMixin):
         'email',
         'is_deceased',
         'bhs_id',
-        'mc_pk',
         'birth_date',
         'part',
         'mon',

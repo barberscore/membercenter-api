@@ -52,9 +52,9 @@ class IgnoreClientContentNegotiation(BaseContentNegotiation):
 class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.select_related(
         # 'owner',
-        'parent',
+        # 'parent',
     ).prefetch_related(
-        'owners',
+        # 'owners',
         # 'children',
         # 'awards',
         # 'appearances',
@@ -64,8 +64,8 @@ class GroupViewSet(viewsets.ModelViewSet):
         # 'members__person',
         # 'officers',
         # 'officers__person',
-        'repertories',
-        'repertories__chart',
+        # 'repertories',
+        # 'repertories__chart',
         # 'statelogs',
     ).distinct()
     serializer_class = GroupSerializer
@@ -74,7 +74,7 @@ class GroupViewSet(viewsets.ModelViewSet):
         DjangoFilterBackend,
     ]
     permission_classes = [
-        DRYPermissions,
+        # DRYPermissions,
     ]
     resource_name = "group"
 
@@ -110,7 +110,9 @@ class GroupViewSet(viewsets.ModelViewSet):
         methods=['get'],
         detail=True,
         renderer_classes=[XLSXRenderer],
-        permission_classes=[DRYPermissions],
+        permission_classes=[
+            # DRYPermissions,
+        ],
         content_negotiation_class=IgnoreClientContentNegotiation,
     )
     def roster(self, request, pk=None):
@@ -133,7 +135,9 @@ class GroupViewSet(viewsets.ModelViewSet):
         methods=['get'],
         detail=False,
         renderer_classes=[XLSXRenderer],
-        permission_classes=[DRYPermissions],
+        permission_classes=[
+            # DRYPermissions,
+        ],
         content_negotiation_class=IgnoreClientContentNegotiation,
     )
     def quartets(self, request):
@@ -159,7 +163,7 @@ class MemberViewSet(viewsets.ModelViewSet):
         DjangoFilterBackend,
     ]
     permission_classes = [
-        DRYPermissions,
+        # DRYPermissions,
     ]
     resource_name = "member"
 
@@ -205,7 +209,7 @@ class OfficerViewSet(viewsets.ModelViewSet):
         DjangoFilterBackend,
     ]
     permission_classes = [
-        DRYPermissions,
+        # DRYPermissions,
     ]
     resource_name = "officer"
 
@@ -240,7 +244,7 @@ class OfficerViewSet(viewsets.ModelViewSet):
 
 class PersonViewSet(viewsets.ModelViewSet):
     queryset = Person.objects.select_related(
-        'user',
+        # 'user',
     ).prefetch_related(
         # 'assignments',
         # 'members',
@@ -254,7 +258,7 @@ class PersonViewSet(viewsets.ModelViewSet):
         DjangoFilterBackend,
     ]
     permission_classes = [
-        DRYPermissions,
+        # DRYPermissions,
     ]
     resource_name = "person"
 
