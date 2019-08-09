@@ -313,6 +313,7 @@ class PersonAdmin(VersionAdmin, FSMTransitionMixin):
         'image',
         'description',
         'notes',
+        'owners',
         ('created', 'modified',),
         # 'user',
     ]
@@ -374,9 +375,9 @@ class PersonAdmin(VersionAdmin, FSMTransitionMixin):
         'email',
     ]
 
-    # autocomplete_fields = [
-    #     'user',
-    # ]
+    autocomplete_fields = [
+        'owners',
+    ]
 
     save_on_top = True
 

@@ -274,6 +274,12 @@ class Person(TimeStampedModel):
     )
 
     # Relations
+    owners = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name='persons',
+        blank=True,
+    )
+
     statelogs = GenericRelation(
         StateLog,
         related_query_name='persons',
@@ -287,6 +293,10 @@ class Person(TimeStampedModel):
                 status__gt=0,
             )
         )
+
+    @cached_property
+    def usernames(self):
+        return [x.email for x in self.owners.all()]
 
     @cached_property
     def nomen(self):
@@ -781,6 +791,10 @@ class Group(TimeStampedModel):
     )
 
     # Properties
+    @cached_property
+    def usernames(self):
+        return [x.email for x in self.owners.all()]
+
     @cached_property
     def nomen(self):
         if self.bhs_id:

@@ -4,6 +4,8 @@ from dry_rest_permissions.generics import DRYPermissionsField
 from rest_framework.serializers import SerializerMethodField
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework_json_api import serializers
+from rest_framework_json_api.relations import ResourceRelatedField
+from django.contrib.auth import get_user_model
 
 # Local
 from .fields import TimezoneField
@@ -12,6 +14,7 @@ from .models import Member
 from .models import Officer
 from .models import Person
 
+User = get_user_model()
 
 class GroupSerializer(serializers.ModelSerializer):
     permissions = DRYPermissionsField()
@@ -65,6 +68,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
             # 'repertories',
             'permissions',
+            'usernames',
 
             'nomen',
             'image_id',
@@ -72,6 +76,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
         read_only_fields = [
             'nomen',
+            'usernames',
             'image_id',
         ]
 
@@ -132,6 +137,17 @@ class OfficerSerializer(serializers.ModelSerializer):
 
 class PersonSerializer(serializers.ModelSerializer):
     permissions = DRYPermissionsField()
+    # owners = ResourceRelatedField(
+    #     queryset=User.objects,
+    #     many=True,
+    #     read_only=False,
+    #     related_link_lookup_field='username',
+    # )
+    # included_serializers = {
+    #     'owners': 'rest_framework_jwt.serializers.UserSerializer',
+    #     # 'members': 'apps.bhs.serializers.MemberSerializer',
+    #     # 'officers': 'apps.bhs.serializers.OfficerSerializer',
+    # }
 
     class Meta:
         model = Person
@@ -178,7 +194,7 @@ class PersonSerializer(serializers.ModelSerializer):
             # 'current_status',
             # 'current_district',
 
-            # 'user',
+            'usernames',
             'permissions',
         ]
         read_only_fields = [
@@ -189,7 +205,14 @@ class PersonSerializer(serializers.ModelSerializer):
             'sort_name',
             'initials',
             'image_id',
+            'usernames',
             # 'current_through',
             # 'current_status',
             # 'current_district',
+        ]
+    class JSONAPIMeta:
+        included_resources = [
+            # 'owners',
+            # 'members',
+            # 'officers',
         ]
