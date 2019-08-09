@@ -60,7 +60,9 @@ LOGOUT_REDIRECT_URL = 'admin:login'
 JWT_AUTH = {
     'AUTH0_DOMAIN': get_env_variable("AUTH0_DOMAIN"),
     'AUTH0_AUDIENCE': get_env_variable("AUTH0_AUDIENCE"),
-    'JWT_AUDIENCE': get_env_variable("MEMBERCENTER_AUDIENCE"),
+    'JWT_AUDIENCE': get_env_variable("AUTH0_CLIENT_ID"),
+    'AUTH0_CLIENT_ID': get_env_variable("AUTH0_CLIENT_ID"),
+    'AUTH0_CLIENT_SECRET': get_env_variable("AUTH0_CLIENT_SECRET"),
 }
 
 # File Management
