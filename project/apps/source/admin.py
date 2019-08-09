@@ -41,7 +41,7 @@ class HumanAdmin(ReadOnlyAdmin):
         ('home_phone', 'work_phone', 'cell_phone',),
         ('part', 'gender',),
         ('is_deceased', 'is_honorary', 'is_suspended', 'is_expelled',),
-        ('merged_id', 'deleted_id',),
+        ('merged_id',),
         ('created', 'modified',),
     ]
 
