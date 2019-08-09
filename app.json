@@ -28,15 +28,24 @@
     "postdeploy": "django-admin migrate"
   },
   "env": {
+    "MEMBERCENTER_CLIENT_ID": {
       "description": "Auth0 Client id.",
       "required": true
     },
-    "AUTH0_CLIENT_SECRET": {
+    "MEMBERCENTER_CLIENT_SECRET": {
       "description": "Auth0 Client secret.",
       "required": true
     },
     "AUTH0_DOMAIN": {
-      "description": "Auth0 API endpoint.",
+      "description": "Auth0 Authorization endpoint.",
+      "required": true
+    },
+    "AUTH0_AUDIENCE": {
+      "description": "Auth0 Management endpoint.",
+      "required": true
+    },
+    "BHS_DATABASE_URL": {
+      "description": "BHS source database.",
       "required": true
     },
     "CLOUDINARY_URL": {
@@ -76,9 +85,8 @@
           "generator": "secret"
         },
         "CLOUDINARY_URL": "test",
-        "AUTH0_AUDIENCE": "test",
-        "AUTH0_CLIENT_ID": "test",
-        "AUTH0_CLIENT_SECRET": "test",
+        "MEMBERCENTER_CLIENT_ID": "test",
+        "MEMBERCENTER_CLIENT_SECRET": "test",
         "AUTH0_DOMAIN": "test"
       },
       "stack": "heroku-18",
