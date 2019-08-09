@@ -36,6 +36,10 @@
       "description": "Auth0 Client secret.",
       "required": true
     },
+    "MEMBERCENTER_AUDIENCE": {
+      "description": "Auth0 Client secret.",
+      "required": true
+    },
     "AUTH0_DOMAIN": {
       "description": "Auth0 Authorization endpoint.",
       "required": true
