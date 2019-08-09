@@ -1,5 +1,5 @@
 # Third-Party
-from algoliasearch_django.decorators import disable_auto_indexing
+# from algoliasearch_django.decorators import disable_auto_indexing
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from phonenumber_field.validators import validate_international_phonenumber

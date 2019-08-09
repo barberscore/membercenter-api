@@ -24,7 +24,7 @@ sentry_sdk.init(
 )
 
 # Search
-ALGOLIA['AUTO_INDEXING'] = True
+# ALGOLIA['AUTO_INDEXING'] = True
 
 # Logging
 LOGGING = {

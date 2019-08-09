@@ -28,15 +28,6 @@
     "postdeploy": "django-admin migrate"
   },
   "env": {
-    "ALGOLIASEARCH_API_KEY": {
-      "description": "Algolia API key.",
-      "required": true
-    },
-    "ALGOLIASEARCH_APPLICATION_ID": {
-      "description": "Algolia Application ID key.",
-      "required": true
-    },
-    "AUTH0_CLIENT_ID": {
       "description": "Auth0 Client id.",
       "required": true
     },
@@ -85,8 +76,6 @@
           "generator": "secret"
         },
         "CLOUDINARY_URL": "test",
-        "ALGOLIASEARCH_APPLICATION_ID": "test",
-        "ALGOLIASEARCH_API_KEY": "test",
         "AUTH0_AUDIENCE": "test",
         "AUTH0_CLIENT_ID": "test",
         "AUTH0_CLIENT_SECRET": "test",

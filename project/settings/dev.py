@@ -32,7 +32,7 @@ RQ_QUEUES['high']['ASYNC'] = True
 RQ_QUEUES['low']['ASYNC'] = True
 
 # Algolia Overwrite
-ALGOLIA['INDEX_SUFFIX'] = 'dev'
+# ALGOLIA['INDEX_SUFFIX'] = 'dev'
 
 # Logging
 LOGGING = {

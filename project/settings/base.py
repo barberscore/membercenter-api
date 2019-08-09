@@ -162,11 +162,11 @@ RQ_QUEUES = {
 RQ_SHOW_ADMIN_LINK = True
 
 # Algolia
-ALGOLIA = {
-    'APPLICATION_ID': get_env_variable("ALGOLIASEARCH_APPLICATION_ID"),
-    'API_KEY': get_env_variable("ALGOLIASEARCH_API_KEY"),
-    'AUTO_INDEXING': False,
-}
+# ALGOLIA = {
+#     'APPLICATION_ID': get_env_variable("ALGOLIASEARCH_APPLICATION_ID"),
+#     'API_KEY': get_env_variable("ALGOLIASEARCH_API_KEY"),
+#     'AUTO_INDEXING': False,
+# }
 
 # Cloudinary
 CLOUDINARY_URL = get_env_variable("CLOUDINARY_URL")
@@ -226,7 +226,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.humanize',
-    'algoliasearch_django',
+    # 'algoliasearch_django',
     'cloudinary_storage',
     'cloudinary',
     'rest_framework',
