@@ -60,9 +60,9 @@ LOGOUT_REDIRECT_URL = 'admin:login'
 JWT_AUTH = {
     'AUTH0_DOMAIN': get_env_variable("AUTH0_DOMAIN"),
     'AUTH0_AUDIENCE': get_env_variable("AUTH0_AUDIENCE"),
-    'JWT_AUDIENCE': get_env_variable("AUTH0_CLIENT_ID"),
     'AUTH0_CLIENT_ID': get_env_variable("AUTH0_CLIENT_ID"),
     'AUTH0_CLIENT_SECRET': get_env_variable("AUTH0_CLIENT_SECRET"),
+    'JWT_AUDIENCE': get_env_variable("AUTH0_CLIENT_ID"),
 }
 
 # File Management
@@ -193,6 +193,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     ],
     'TEST_REQUEST_RENDERER_CLASSES': (
@@ -231,6 +232,7 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'cloudinary',
     'rest_framework',
+    'rest_framework.authtoken',
     'django_filters',
     'dry_rest_permissions',
     'django_rq',

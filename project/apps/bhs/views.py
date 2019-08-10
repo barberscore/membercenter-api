@@ -74,7 +74,7 @@ class GroupViewSet(viewsets.ModelViewSet):
         DjangoFilterBackend,
     ]
     permission_classes = [
-        # DRYPermissions,
+        DRYPermissions,
     ]
     resource_name = "group"
 
@@ -111,7 +111,7 @@ class GroupViewSet(viewsets.ModelViewSet):
         detail=True,
         renderer_classes=[XLSXRenderer],
         permission_classes=[
-            # DRYPermissions,
+            DRYPermissions,
         ],
         content_negotiation_class=IgnoreClientContentNegotiation,
     )
@@ -136,7 +136,7 @@ class GroupViewSet(viewsets.ModelViewSet):
         detail=False,
         renderer_classes=[XLSXRenderer],
         permission_classes=[
-            # DRYPermissions,
+            DRYPermissions,
         ],
         content_negotiation_class=IgnoreClientContentNegotiation,
     )
@@ -163,7 +163,7 @@ class MemberViewSet(viewsets.ModelViewSet):
         DjangoFilterBackend,
     ]
     permission_classes = [
-        # DRYPermissions,
+        DRYPermissions,
     ]
     resource_name = "member"
 
@@ -209,7 +209,7 @@ class OfficerViewSet(viewsets.ModelViewSet):
         DjangoFilterBackend,
     ]
     permission_classes = [
-        # DRYPermissions,
+        DRYPermissions,
     ]
     resource_name = "officer"
 
@@ -258,7 +258,7 @@ class PersonViewSet(viewsets.ModelViewSet):
         DjangoFilterBackend,
     ]
     permission_classes = [
-        # DRYPermissions,
+        DRYPermissions,
     ]
     resource_name = "person"
 
