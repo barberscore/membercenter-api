@@ -13,9 +13,9 @@ User = get_user_model()
 Person = apps.get_model('bhs.person')
 Group = apps.get_model('bhs.group')
 Officer = apps.get_model('bhs.officer')
-Human = apps.get_model('bhs.human')
-Structure = apps.get_model('bhs.structure')
-Role = apps.get_model('bhs.role')
+Human = apps.get_model('source.human')
+Structure = apps.get_model('source.structure')
+Role = apps.get_model('source.role')
 # Member = apps.get_model('bhs.member')
 # Subscription = apps.get_model('bhs.subscription')
 # Join = apps.get_model('bhs.join')
@@ -78,9 +78,13 @@ class Command(BaseCommand):
             person, _ = Person.objects.update_or_create_from_human(human)
             # Only link user if there are officers and an email
             if person.email and person.officers.filter(status__gt=0):
-                user, _ = User.objects.get_or_create(email=person.email)
-                # person.user = user
-                person.save()
+                user, _ = User.objects.get_or_create(
+                    email=person.email,
+                    name=person.name,
+                    first_name=person.first_name,
+                    last_name=person.last_name,
+                )
+                person.owners.add(user)
         self.stdout.write("")
         self.stdout.write("Updated {0} Persons.".format(t))
         if not cursor:
@@ -117,8 +121,14 @@ class Command(BaseCommand):
             self.stdout.flush()
             self.stdout.write("Updating {0} of {1} Officers...".format(i, t), ending='\r')
             officer, _ = Officer.objects.update_or_create_from_role(role)
+            # Only add owner if there is an email
             if officer.person.email:
-                user, _ = User.objects.get_or_create(email=person.email)
+                user, _ = User.objects.get_or_create(
+                    email=person.email,
+                    name=person.name,
+                    first_name=person.first_name,
+                    last_name=person.last_name,
+                )
                 officer.group.owners.add(user)
 
         self.stdout.write("")
