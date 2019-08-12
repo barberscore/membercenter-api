@@ -534,13 +534,15 @@ class GroupManager(Manager):
         root = self.get(kind=self.model.KIND.international)
         i = 1
         root.tree_sort = i
-        with disable_auto_indexing(model=self.model):
-            root.save()
+        # with disable_auto_indexing(model=self.model):
+        #     root.save()
+        root.save()
         for child in root.children.order_by('kind', 'code', 'name'):
             i += 1
             child.tree_sort = i
-            with disable_auto_indexing(model=self.model):
-                child.save()
+            # with disable_auto_indexing(model=self.model):
+            #     child.save()
+            child.save()
         orgs = self.filter(
             kind__in=[
                 self.model.KIND.chapter,
@@ -554,37 +556,40 @@ class GroupManager(Manager):
         for org in orgs:
             i += 1
             org.tree_sort = i
-            with disable_auto_indexing(model=self.model):
-                org.save()
+            # with disable_auto_indexing(model=self.model):
+            #     org.save()
+            org.save()
         return
 
-    def denormalize(self, cursor=None):
-        groups = self.filter(status=self.model.STATUS.active)
-        if cursor:
-            groups = groups.filter(
-                modified__gte=cursor,
-            )
-        for group in groups:
-            group.denormalize()
-            with disable_auto_indexing(model=self.model):
-                group.save()
-        return
+    # def denormalize(self, cursor=None):
+    #     groups = self.filter(status=self.model.STATUS.active)
+    #     if cursor:
+    #         groups = groups.filter(
+    #             modified__gte=cursor,
+    #         )
+    #     for group in groups:
+    #         group.denormalize()
+    #         # with disable_auto_indexing(model=self.model):
+    #         #     group.save()
+    #         group.save()
+    #     return
 
-    def update_seniors(self):
-        quartets = self.filter(
-            kind=self.model.KIND.quartet,
-            status__gt=0,
-            id__isnull=False,
-        )
+    # def update_seniors(self):
+    #     quartets = self.filter(
+    #         kind=self.model.KIND.quartet,
+    #         status__gt=0,
+    #         id__isnull=False,
+    #     )
 
-        for quartet in quartets:
-            prior = quartet.is_senior
-            is_senior = quartet.get_is_senior()
-            if prior != is_senior:
-                quartet.is_senior = is_senior
-                with disable_auto_indexing(model=self.model):
-                    quartet.save()
-        return
+    #     for quartet in quartets:
+    #         prior = quartet.is_senior
+    #         is_senior = quartet.get_is_senior()
+    #         if prior != is_senior:
+    #             quartet.is_senior = is_senior
+    #             # with disable_auto_indexing(model=self.model):
+    #             #     quartet.save()
+    #             quartet.save()
+    #     return
 
     def get_quartets(self):
         wb = Workbook()

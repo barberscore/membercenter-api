@@ -22,6 +22,12 @@ class GroupFilterset(FilterSet):
             'kind': [
                 'gt',
             ],
+            'created': [
+                'gt',
+            ],
+            'modified': [
+                'gt',
+            ],
         }
 
 
@@ -69,5 +75,11 @@ class PersonFilterset(FilterSet):
             # ],
             'status': [
                 'exact',
+            ],
+            'created': [
+                'gt',
+            ],
+            'modified': [
+                'gt',
             ],
         }

@@ -124,10 +124,10 @@ class Command(BaseCommand):
             # Only add owner if there is an email
             if officer.person.email:
                 user, _ = User.objects.get_or_create(
-                    email=person.email,
-                    name=person.name,
-                    first_name=person.first_name,
-                    last_name=person.last_name,
+                    email=officer.person.email,
+                    name=officer.person.name,
+                    first_name=officer.person.first_name,
+                    last_name=officer.person.last_name,
                 )
                 officer.group.owners.add(user)
 

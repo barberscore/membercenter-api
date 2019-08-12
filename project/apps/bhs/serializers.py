@@ -72,12 +72,16 @@ class GroupSerializer(serializers.ModelSerializer):
 
             'nomen',
             'image_id',
+            'created',
+            'modified',
         ]
 
         read_only_fields = [
             'nomen',
             'usernames',
             'image_id',
+            'created',
+            'modified',
         ]
 
     class JSONAPIMeta:
@@ -196,6 +200,8 @@ class PersonSerializer(serializers.ModelSerializer):
 
             'usernames',
             'permissions',
+            'created',
+            'modified',
         ]
         read_only_fields = [
             'nomen',
@@ -209,6 +215,8 @@ class PersonSerializer(serializers.ModelSerializer):
             # 'current_through',
             # 'current_status',
             # 'current_district',
+            'created',
+            'modified',
         ]
     class JSONAPIMeta:
         included_resources = [
