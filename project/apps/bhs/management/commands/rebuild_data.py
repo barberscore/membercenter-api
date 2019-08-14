@@ -40,17 +40,21 @@ class Command(BaseCommand):
                 log.error(e)
                 continue
             # Update User if account?
-            if member.group.bhs_id == 1:
+            if member.group.bhs_id == 1 and member.person.email:
                 person = member.person
                 person.current_through = member.end_date
                 person.status = member.status
                 person.save()
-                user, _ = User.objects.get_or_create(
-                    email=person.email,
-                    name=person.name,
-                    first_name=person.first_name,
-                    last_name=person.last_name,
-                )
+                try:
+                    user, _ = User.objects.get_or_create(
+                        email=person.email,
+                        name=person.name,
+                        first_name=person.first_name,
+                        last_name=person.last_name,
+                    )
+                except Exception as e:
+                    log.error(e)
+                    continue
                 person.owners.add(user)
         self.stdout.write("")
         self.stdout.write("Updated {0} Members.".format(t))
