@@ -2,58 +2,61 @@
 
 # Standard Library
 import datetime
+import logging
 
 # Django
 from django.apps import apps
 from django.core.management.base import BaseCommand
-from django.utils import timezone
+from django.contrib.auth import get_user_model
+
+
+log = logging.getLogger('updater')
 
 
 class Command(BaseCommand):
-    help = "Command to rebuild denorms."
-
-    def add_arguments(self, parser):
-        parser.add_argument(
-            '--days',
-            type=int,
-            dest='days',
-            nargs='?',
-            const=1,
-            help='Number of days to update.',
-        )
-
-        parser.add_argument(
-            '--hours',
-            type=int,
-            dest='hours',
-            nargs='?',
-            const=1,
-            help='Number of hours to update.',
-        )
-
-        parser.add_argument(
-            '--minutes',
-            type=int,
-            dest='minutes',
-            nargs='?',
-            const=1,
-            help='Number of hours to update.',
-        )
+    help = "Nightly rebuild."
 
     def handle(self, *args, **options):
-        # Set Cursor
-        if options['days']:
-            cursor = timezone.now() - datetime.timedelta(days=options['days'], hours=1)
-        elif options['hours']:
-            cursor = timezone.now() - datetime.timedelta(hours=options['hours'], minutes=5)
-        elif options['minutes']:
-            cursor = timezone.now() - datetime.timedelta(minutes=options['minutes'], seconds=5)
-        else:
-            cursor = None
-        Group = apps.get_model('bhs.group')
-        # Group.objects.denormalize(cursor=cursor)
-        Group.objects.sort_tree()
-        # Group.objects.update_seniors()
-        Award = apps.get_model('bhs.award')
-        Award.objects.sort_tree()
+        # Group = apps.get_model('bhs.group')
+        # Group.objects.sort_tree()
+        # Award = apps.get_model('bhs.award')
+        # Award.objects.sort_tree()
+
+        Join = apps.get_model('source.join')
+        Member = apps.get_model('bhs.member')
+        User = get_user_model()
+        # Sync Members
+        self.stdout.write("Fetching Joins from Source Database...")
+        joins = Join.objects.export_values(cursor=None)
+        t = len(joins)
+        i = 0
+        for join in joins:
+            i += 1
+            self.stdout.flush()
+            self.stdout.write("Updating {0} of {1} Members...".format(i, t), ending='\r')
+            try:
+                member, _ = Member.objects.update_or_create_from_join(join)
+            except Exception as e:
+                log.error(e)
+                continue
+            # Update User if account?
+            if member.group.bhs_id == 1:
+                person = member.person
+                person.current_through = member.end_date
+                person.status = member.status
+                person.save()
+                user, _ = User.objects.get_or_create(
+                    email=person.email,
+                    name=person.name,
+                    first_name=person.first_name,
+                    last_name=person.last_name,
+                )
+                person.owners.add(user)
+        self.stdout.write("")
+        self.stdout.write("Updated {0} Members.".format(t))
+        # if not cursor:
+        #     self.stdout.write("Deleting orphans...")
+        #     joins = list(Join.objects.values_list('id', flat=True))
+        #     t = Member.objects.delete_orphans(joins)
+        #     self.stdout.write("Deleted {0} Member orphans.".format(t)
         return

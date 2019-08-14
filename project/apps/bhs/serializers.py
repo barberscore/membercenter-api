@@ -141,17 +141,17 @@ class OfficerSerializer(serializers.ModelSerializer):
 
 class PersonSerializer(serializers.ModelSerializer):
     permissions = DRYPermissionsField()
-    # owners = ResourceRelatedField(
-    #     queryset=User.objects,
-    #     many=True,
-    #     read_only=False,
-    #     related_link_lookup_field='username',
-    # )
+    owners = ResourceRelatedField(
+        many=True,
+        read_only=True,
+    )
     # included_serializers = {
     #     'owners': 'rest_framework_jwt.serializers.UserSerializer',
     #     # 'members': 'apps.bhs.serializers.MemberSerializer',
     #     # 'officers': 'apps.bhs.serializers.OfficerSerializer',
     # }
+
+
 
     class Meta:
         model = Person
@@ -194,10 +194,13 @@ class PersonSerializer(serializers.ModelSerializer):
             'sort_name',
             'initials',
             'image_id',
-            # 'current_through',
+            'owners',
+            'current_through',
+
             # 'current_status',
             # 'current_district',
 
+            # 'owners',
             'usernames',
             'permissions',
             'created',

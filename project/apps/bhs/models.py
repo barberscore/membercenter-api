@@ -273,6 +273,12 @@ class Person(TimeStampedModel):
         editable=False,
     )
 
+    current_through = models.DateField(
+        editable=False,
+        null=True,
+        blank=True,
+    )
+
     # Relations
     owners = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
@@ -296,7 +302,7 @@ class Person(TimeStampedModel):
 
     @cached_property
     def usernames(self):
-        return [x.email for x in self.owners.all()]
+        return [x.username for x in self.owners.all()]
 
     @cached_property
     def nomen(self):
@@ -793,7 +799,7 @@ class Group(TimeStampedModel):
     # Properties
     @cached_property
     def usernames(self):
-        return [x.email for x in self.owners.all()]
+        return [x.username for x in self.owners.all()]
 
     @cached_property
     def nomen(self):

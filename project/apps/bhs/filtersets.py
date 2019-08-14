@@ -57,8 +57,17 @@ class OfficerFilterset(FilterSet):
             'group__status': [
                 'exact',
             ],
+            'group__kind': [
+                'gt',
+            ],
             'status': [
                 'exact',
+            ],
+            'created': [
+                'gt',
+            ],
+            'modified': [
+                'gt',
             ],
         }
 

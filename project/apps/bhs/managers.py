@@ -59,16 +59,16 @@ class PersonManager(Manager):
             is_expelled = human.is_expelled
 
         # Transform
-        inactive = any([
-            is_deceased,
-            is_honorary,
-            is_suspended,
-            is_expelled,
-        ])
-        if inactive:
-            status = self.model.STATUS.inactive
-        else:
-            status = self.model.STATUS.active
+        # inactive = any([
+        #     is_deceased,
+        #     is_honorary,
+        #     is_suspended,
+        #     is_expelled,
+        # ])
+        # if inactive:
+        #     status = self.model.STATUS.inactive
+        # else:
+        #     status = self.model.STATUS.active
 
         prefix = first_name.rpartition('Dr.')[1].strip()
         first_name = first_name.rpartition('Dr.')[2].strip()
@@ -155,7 +155,7 @@ class PersonManager(Manager):
 
 
         defaults = {
-            'status': status,
+            # 'status': status,
             'prefix': prefix,
             'first_name': first_name,
             'middle_name': middle_name,
@@ -742,4 +742,3 @@ class MemberManager(Manager):
         t = orphans.count()
         orphans.delete()
         return t
-

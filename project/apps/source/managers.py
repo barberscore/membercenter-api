@@ -133,7 +133,6 @@ class RoleManager(Manager):
 
 class JoinManager(Manager):
     def export_values(self, cursor=None):
-        Structure = apps.get_model('bhs.structure')
         today = date.today()
         js = self.select_related(
             'structure',
@@ -193,8 +192,8 @@ class JoinManager(Manager):
                 When(
                     Q(
                         structure__kind__in=[
-                            Structure.KIND.chorus,
-                            Structure.KIND.chapter,
+                            'chorus',
+                            'chapter',
                         ],
                     ),
                     then=F('inactivist_date'),

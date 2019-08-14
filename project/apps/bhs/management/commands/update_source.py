@@ -13,12 +13,13 @@ User = get_user_model()
 Person = apps.get_model('bhs.person')
 Group = apps.get_model('bhs.group')
 Officer = apps.get_model('bhs.officer')
+Member = apps.get_model('bhs.member')
+
 Human = apps.get_model('source.human')
 Structure = apps.get_model('source.structure')
 Role = apps.get_model('source.role')
-# Member = apps.get_model('bhs.member')
-# Subscription = apps.get_model('bhs.subscription')
-# Join = apps.get_model('bhs.join')
+Subscription = apps.get_model('source.subscription')
+Join = apps.get_model('source.join')
 
 
 log = logging.getLogger('updater')
@@ -67,7 +68,7 @@ class Command(BaseCommand):
             cursor = None
 
         # Sync Persons
-        self.stdout.write("Fetching Humans from Member Center...")
+        self.stdout.write("Fetching Humans from Source Database...")
         humans = Human.objects.export_values(cursor=cursor)
         t = len(humans)
         i = 0
@@ -75,16 +76,7 @@ class Command(BaseCommand):
             i += 1
             self.stdout.flush()
             self.stdout.write("Updating {0} of {1} Persons...".format(i, t), ending='\r')
-            person, _ = Person.objects.update_or_create_from_human(human)
-            # Only link user if there are officers and an email
-            if person.email and person.officers.filter(status__gt=0):
-                user, _ = User.objects.get_or_create(
-                    email=person.email,
-                    name=person.name,
-                    first_name=person.first_name,
-                    last_name=person.last_name,
-                )
-                person.owners.add(user)
+            Person.objects.update_or_create_from_human(human)
         self.stdout.write("")
         self.stdout.write("Updated {0} Persons.".format(t))
         if not cursor:
@@ -94,7 +86,7 @@ class Command(BaseCommand):
             self.stdout.write("Deleted {0} Person orphans.".format(t))
 
         # Sync Groups
-        self.stdout.write("Fetching Structures from Member Center...")
+        self.stdout.write("Fetching Structures from Source Database...")
         structures = Structure.objects.export_values(cursor=cursor)
         t = len(structures)
         i = 0
@@ -112,7 +104,7 @@ class Command(BaseCommand):
             self.stdout.write("Deleted {0} Group orphans.".format(t))
 
         # Sync Officers
-        self.stdout.write("Fetching Roles from Member Center...")
+        self.stdout.write("Fetching Roles from Source Database...")
         roles = Role.objects.export_values(cursor=cursor)
         t = len(roles)
         i = 0
@@ -130,7 +122,6 @@ class Command(BaseCommand):
                     last_name=officer.person.last_name,
                 )
                 officer.group.owners.add(user)
-
         self.stdout.write("")
         self.stdout.write("Updated {0} Officers.".format(t))
         if not cursor:
@@ -138,25 +129,4 @@ class Command(BaseCommand):
             roles = list(Role.objects.values_list('id', flat=True))
             t = Officer.objects.delete_orphans(roles)
             self.stdout.write("Deleted {0} Officer orphans.".format(t))
-
-
-        # # Sync Members
-        # self.stdout.write("Updating Members.")
-        # self.stdout.write("Fetching Joins...")
-        # joins = Join.objects.export_values(cursor=cursor)
-        # t = len(joins)
-        # i = 0
-        # for join in joins:
-        #     i += 1
-        #     if i != t:
-        #         self.stdout.flush()
-        #     self.stdout.write("Updating {0} of {1} Members...".format(i, t), ending='\r')
-        #     Member.objects.update_or_create_from_join(join)
-        # self.stdout.write("Updated {0} Members.".format(t))
-        # if not cursor:
-        #     self.stdout.write("Deleting orphans...")
-        #     joins = list(Join.objects.values_list('id', flat=True))
-        #     t = Member.objects.delete_orphans(joins)
-        #     self.stdout.write("Deleted {0} Member orphans.".format(t))
-
         self.stdout.write("Complete.")

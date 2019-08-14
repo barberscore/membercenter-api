@@ -34,7 +34,6 @@ from .serializers import PersonSerializer
 log = logging.getLogger(__name__)
 
 
-
 class IgnoreClientContentNegotiation(BaseContentNegotiation):
     def select_parser(self, request, parsers):
         """

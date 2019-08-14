@@ -305,6 +305,7 @@ class PersonAdmin(VersionAdmin, FSMTransitionMixin):
         ('email', 'bhs_id', 'birth_date',),
         ('home_phone', 'work_phone', 'cell_phone',),
         ('part', 'gender',),
+        'current_through',
         ('is_deceased', 'is_honorary', 'is_suspended', 'is_expelled',),
         'spouse',
         'location',
@@ -329,6 +330,7 @@ class PersonAdmin(VersionAdmin, FSMTransitionMixin):
 
     list_filter = [
         'status',
+        'current_through',
         'gender',
         'part',
         'is_deceased',
@@ -345,6 +347,7 @@ class PersonAdmin(VersionAdmin, FSMTransitionMixin):
         'last_name',
         'nick_name',
         'email',
+        'current_through',
         'is_deceased',
         'bhs_id',
         'birth_date',
