@@ -21,3 +21,9 @@ def create_or_update_person_from_human(human):
 def create_or_update_officer_from_role(role):
     Officer = apps.get_model('bhs.officer')
     return Officer.objects.update_or_create_from_role(role)
+
+
+@job('low')
+def create_or_update_member_from_join(join):
+    Member = apps.get_model('bhs.member')
+    return Member.objects.update_or_create_from_join(join)

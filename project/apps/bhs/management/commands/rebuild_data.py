@@ -12,6 +12,8 @@ from django.contrib.auth import get_user_model
 
 log = logging.getLogger('updater')
 
+from apps.bhs.tasks import create_or_update_member_from_join
+
 
 class Command(BaseCommand):
     help = "Nightly rebuild."
@@ -23,8 +25,6 @@ class Command(BaseCommand):
         # Award.objects.sort_tree()
 
         Join = apps.get_model('source.join')
-        Member = apps.get_model('bhs.member')
-        User = get_user_model()
         # Sync Members
         self.stdout.write("Fetching Joins from Source Database...")
         joins = Join.objects.export_values(cursor=None)
@@ -34,33 +34,13 @@ class Command(BaseCommand):
             i += 1
             self.stdout.flush()
             self.stdout.write("Updating {0} of {1} Members...".format(i, t), ending='\r')
-            try:
-                member, _ = Member.objects.update_or_create_from_join(join)
-            except Exception as e:
-                log.error(e)
-                continue
-            # Update User if account?
-            if member.group.bhs_id == 1 and member.person.email:
-                person = member.person
-                person.current_through = member.end_date
-                person.status = member.status
-                person.save()
-                try:
-                    user, _ = User.objects.get_or_create(
-                        email=person.email,
-                        name=person.name,
-                        first_name=person.first_name,
-                        last_name=person.last_name,
-                    )
-                except Exception as e:
-                    log.error(e)
-                    continue
-                person.owners.add(user)
+            create_or_update_member_from_join.delay(join)
         self.stdout.write("")
         self.stdout.write("Updated {0} Members.".format(t))
-        # if not cursor:
-        #     self.stdout.write("Deleting orphans...")
-        #     joins = list(Join.objects.values_list('id', flat=True))
-        #     t = Member.objects.delete_orphans(joins)
-        #     self.stdout.write("Deleted {0} Member orphans.".format(t)
+        # Delete Orphans
+        # self.stdout.write("Deleting orphans...")
+        # joins = list(Join.objects.values_list('id', flat=True))
+        # t = Member.objects.delete_orphans(joins)
+        # self.stdout.write("Deleted {0} Member orphans.".format(t)
+        self.stdout.write("Complete.")
         return

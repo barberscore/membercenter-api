@@ -676,7 +676,17 @@ class OfficerManager(Manager):
             office=office,
             defaults=defaults,
         )
+        # Only add owner if there is an email
+        if officer.person.email:
+            user, _ = User.objects.get_or_create(
+                email=officer.person.email,
+                name=officer.person.name,
+                first_name=officer.person.first_name,
+                last_name=officer.person.last_name,
+            )
+            officer.group.owners.add(user)
         return officer, created
+
 
     def delete_orphans(self, roles):
         # Delete Orphans
@@ -730,7 +740,25 @@ class MemberManager(Manager):
             group=group,
             defaults=defaults,
         )
+        # Update Person/User conditionally
+        check = all([
+            member.group.bhs_id == 1, # Only check BHS membership
+            member.person.email, # With an email
+            status > 0, # And currently active status
+        ])
+        if check:
+            person.current_through = member.end_date
+            person.status = member.status
+            person.save()
+            user, _ = User.objects.get_or_create(
+                email=person.email,
+                name=person.name,
+                first_name=person.first_name,
+                last_name=person.last_name,
+            )
+            person.owners.add(user)
         return member, created
+
 
     def delete_orphans(self, joins):
         # Delete Orphans

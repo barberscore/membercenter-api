@@ -21,6 +21,9 @@ Role = apps.get_model('source.role')
 Subscription = apps.get_model('source.subscription')
 Join = apps.get_model('source.join')
 
+from apps.bhs.tasks import create_or_update_person_from_human
+from apps.bhs.tasks import create_or_update_officer_from_role
+from apps.bhs.tasks import create_or_update_group_from_structure
 
 log = logging.getLogger('updater')
 
@@ -76,7 +79,7 @@ class Command(BaseCommand):
             i += 1
             self.stdout.flush()
             self.stdout.write("Updating {0} of {1} Persons...".format(i, t), ending='\r')
-            Person.objects.update_or_create_from_human(human)
+            create_or_update_person_from_human.delay(human)
         self.stdout.write("")
         self.stdout.write("Updated {0} Persons.".format(t))
         if not cursor:
@@ -94,7 +97,7 @@ class Command(BaseCommand):
             i += 1
             self.stdout.flush()
             self.stdout.write("Updating {0} of {1} Groups...".format(i, t), ending='\r')
-            Group.objects.update_or_create_from_structure(structure)
+            create_or_update_group_from_structure.delay(structure)
         self.stdout.write("")
         self.stdout.write("Updated {0} Groups.".format(t))
         if not cursor:
@@ -112,16 +115,7 @@ class Command(BaseCommand):
             i += 1
             self.stdout.flush()
             self.stdout.write("Updating {0} of {1} Officers...".format(i, t), ending='\r')
-            officer, _ = Officer.objects.update_or_create_from_role(role)
-            # Only add owner if there is an email
-            if officer.person.email:
-                user, _ = User.objects.get_or_create(
-                    email=officer.person.email,
-                    name=officer.person.name,
-                    first_name=officer.person.first_name,
-                    last_name=officer.person.last_name,
-                )
-                officer.group.owners.add(user)
+            create_or_update_officer_from_role.delay(role)
         self.stdout.write("")
         self.stdout.write("Updated {0} Officers.".format(t))
         if not cursor:
