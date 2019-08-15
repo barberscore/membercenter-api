@@ -148,11 +148,11 @@
         },
         "django-cors-headers": {
             "hashes": [
-                "sha256:5b80bf0f8d7fc6e2bcb4f40781d5ff3661961bbf1982e52daec77241dea3b890",
-                "sha256:ebf3e2cf25aa6993b959a8e6a87828ebb3c8fe5bc3ec4a2d6e65f3b8d9b4212c"
+                "sha256:e4b12209b3a0bc577883fe0ac0aa3adac9e82742389f8ddb6c6b41c66b1e9c4f",
+                "sha256:e69b1c909f2eddc7ef2a24f071583bc22b73b871731ea3370ac52b3318c43b3c"
             ],
             "index": "pypi",
-            "version": "==3.0.2"
+            "version": "==3.1.0"
         },
         "django-filter": {
             "hashes": [
@@ -255,7 +255,7 @@
         },
         "djangorestframework-jwt": {
             "git": "https://github.com/barberscore/django-rest-framework-jwt.git",
-            "ref": "9e274fd46fead8d899d9ab6aeb22a643de673ca1"
+            "ref": "8683245d4249bca99677b8ece32120e4828caa4c"
         },
         "dry-rest-permissions": {
             "hashes": [
@@ -322,10 +322,10 @@
         },
         "jedi": {
             "hashes": [
-                "sha256:53c850f1a7d3cfcd306cc513e2450a54bdf5cacd7604b74e42dd1f0758eaaf36",
-                "sha256:e07457174ef7cb2342ff94fa56484fe41cec7ef69b0059f01d3f812379cb6f7c"
+                "sha256:786b6c3d80e2f06fd77162a07fed81b8baa22dde5d62896a790a331d6ac21a27",
+                "sha256:ba859c74fa3c966a22f2aeebe1b74ee27e2a462f56d3f5f7ca4a59af61bfe42e"
             ],
-            "version": "==0.14.1"
+            "version": "==0.15.1"
         },
         "maya": {
             "hashes": [
@@ -344,10 +344,10 @@
         },
         "mysqlclient": {
             "hashes": [
-                "sha256:0d3eeb97534c9f42e9b65bd35c1a35fadc2f6d7ea5d9fdbda5339a569156344b"
+                "sha256:9c737cc55a5dc8dd3583a942d5a9b21be58d16f00f5fefca4e575e7d9682e98c"
             ],
             "index": "pypi",
-            "version": "==1.4.3"
+            "version": "==1.4.4"
         },
         "openpyxl": {
             "hashes": [
@@ -508,11 +508,11 @@
         },
         "redis": {
             "hashes": [
-                "sha256:45682ecf226c7611efe731974c4fa3390170ba045b9cdb26f0051114a5c2a68b",
-                "sha256:f2609a85e5f37f489ba3b5652e1175dc3711c4d7a7818c4f657615810afd23df"
+                "sha256:0607faf60d44768e17f65e506fe390679b54be6fd6d5f0c2d28f3ebf4f0535e7",
+                "sha256:9c96c5bf11a8c47eb33cefdefd41c47cf1ff68db41c51b56b3ec7938b7c627f7"
             ],
             "index": "pypi",
-            "version": "==3.3.6"
+            "version": "==3.3.7"
         },
         "regex": {
             "hashes": [
