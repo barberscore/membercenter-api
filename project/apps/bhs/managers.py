@@ -78,10 +78,10 @@ class PersonManager(Manager):
         suffix = last_name.partition('III')[1].strip()
         last_name = last_name.partition('DDS')[0].strip()
         suffix = last_name.partition('DDS')[1].strip()
-        last_name = last_name.partition('Sr')[0].strip()
-        suffix = last_name.partition('Sr')[1].strip()
-        last_name = last_name.partition('Jr')[0].strip()
-        suffix = last_name.partition('Jr')[1].strip()
+        # last_name = last_name.partition('Sr')[0].strip()
+        # suffix = last_name.partition('Sr')[1].strip()
+        # last_name = last_name.partition('Jr')[0].strip()
+        # suffix = last_name.partition('Jr')[1].strip()
         last_name = last_name.partition('M.D.')[0].strip()
         suffix = last_name.partition('M.D.')[1].strip()
         if nick_name == first_name:
@@ -743,7 +743,7 @@ class MemberManager(Manager):
         # Update Person/User conditionally
         check = all([
             member.group.bhs_id == 1, # Only check BHS membership
-            member.person.email, # With an email
+            person.email, # With an email
             status > 0, # And currently active status
         ])
         if check:
