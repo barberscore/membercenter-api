@@ -678,11 +678,14 @@ class OfficerManager(Manager):
         )
         # Only add owner if there is an email
         if officer.person.email:
-            user, _ = User.objects.get_or_create(
+            defaults = {
+                'name': officer.person.name,
+                'first_name': officer.person.first_name,
+                'last_name': officer.person.last_name,
+            }
+            user, _ = User.objects.update_or_create(
                 email=officer.person.email,
-                name=officer.person.name,
-                first_name=officer.person.first_name,
-                last_name=officer.person.last_name,
+                defaults=defaults,
             )
             officer.group.owners.add(user)
         return officer, created
@@ -750,11 +753,14 @@ class MemberManager(Manager):
             person.current_through = member.end_date
             person.status = member.status
             person.save()
-            user, _ = User.objects.get_or_create(
+            defaults = {
+                'name': person.name,
+                'first_name': person.first_name,
+                'last_name': person.last_name,
+            }
+            user, _ = User.objects.update_or_create(
                 email=person.email,
-                name=person.name,
-                first_name=person.first_name,
-                last_name=person.last_name,
+                defaults=defaults,
             )
             person.owners.add(user)
         return member, created
