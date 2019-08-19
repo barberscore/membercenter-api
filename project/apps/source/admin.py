@@ -93,6 +93,8 @@ class HumanAdmin(ReadOnlyAdmin):
         'is_honorary',
         'is_suspended',
         'is_expelled',
+        'created',
+        'modified',
     ]
 
     search_fields = [

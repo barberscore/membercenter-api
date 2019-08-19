@@ -334,6 +334,8 @@ class PersonAdmin(VersionAdmin, FSMTransitionMixin):
         'gender',
         'part',
         'is_deceased',
+        'created',
+        'modified',
     ]
 
     raw_id_fields = [

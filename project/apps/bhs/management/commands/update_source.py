@@ -10,6 +10,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 User = get_user_model()
+
 Person = apps.get_model('bhs.person')
 Group = apps.get_model('bhs.group')
 Officer = apps.get_model('bhs.officer')

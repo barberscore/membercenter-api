@@ -1,3 +1,6 @@
+import django
+django.setup()
+
 # Third-Party
 from django_rq import job
 
