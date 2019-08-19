@@ -381,9 +381,6 @@ class Membership(models.Model):
         max_length=36,
         editable=False,
     )
-    months = models.IntegerField(
-        editable=False,
-    )
     structure = models.ForeignKey(
         'Structure',
         related_name='memberships',

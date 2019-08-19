@@ -32,11 +32,19 @@ class MemberInline(admin.TabularInline):
         'status',
     ]
 
-    show_change_link = True
+    show_change_link = False
     extra = 0
     classes = [
         'collapse',
     ]
+    can_delete = False
+    max_num = 0
+    def has_add_permission(self, request, obj):
+        return False
+    def has_change_permission(self, request, obj):
+        return False
+    def has_delete_permission(self, request, obj):
+        return False
 
 
 class OfficerInline(admin.TabularInline):
@@ -51,10 +59,11 @@ class OfficerInline(admin.TabularInline):
         'person',
         'group',
     ]
-    show_change_link = True
+    show_change_link = False
     extra = 0
+    max_num = 0
     classes = [
-        'collapse',
+        # 'collapse',
     ]
     ordering = [
         'person__last_name',
@@ -62,7 +71,17 @@ class OfficerInline(admin.TabularInline):
     ]
     readonly_fields = [
         'status',
+        'office',
+        'person',
     ]
+    can_delete = False
+
+    def has_add_permission(self, request, obj):
+        return False
+    def has_change_permission(self, request, obj):
+        return False
+    def has_delete_permission(self, request, obj):
+        return False
 
 
 class ActiveChapterInline(admin.TabularInline):

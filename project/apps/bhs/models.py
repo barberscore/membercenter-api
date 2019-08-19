@@ -52,6 +52,7 @@ class Person(TimeStampedModel):
         help_text="""DO NOT CHANGE MANUALLY unless correcting a mistake.  Use the buttons to change state.""",
         choices=STATUS,
         default=STATUS.active,
+        editable=False,
     )
 
     prefix = models.CharField(
@@ -60,6 +61,7 @@ class Person(TimeStampedModel):
         max_length=255,
         blank=True,
         default='',
+        editable=False,
     )
 
     first_name = models.CharField(
@@ -73,6 +75,8 @@ class Person(TimeStampedModel):
         help_text="""
             The middle name of the person.""",
         max_length=255,
+        blank=True,
+        default='',
         editable=False,
     )
 
@@ -87,6 +91,8 @@ class Person(TimeStampedModel):
         help_text="""
             The nickname of the person.""",
         max_length=255,
+        blank=True,
+        default='',
         editable=False,
     )
 
@@ -96,9 +102,11 @@ class Person(TimeStampedModel):
         max_length=255,
         blank=True,
         default='',
+        editable=False,
     )
 
     birth_date = models.DateField(
+        blank=True,
         null=True,
         editable=False,
     )
@@ -107,6 +115,7 @@ class Person(TimeStampedModel):
         max_length=255,
         blank=True,
         default='',
+        editable=True,
     )
 
     location = models.CharField(
@@ -115,6 +124,7 @@ class Person(TimeStampedModel):
         max_length=255,
         blank=True,
         default='',
+        editable=True,
     )
 
     PART = Choices(
@@ -126,6 +136,7 @@ class Person(TimeStampedModel):
 
     part = models.IntegerField(
         choices=PART,
+        blank=True,
         null=True,
         editable=False,
     )
@@ -133,6 +144,7 @@ class Person(TimeStampedModel):
     mon = models.IntegerField(
         help_text="""
             Men of Note.""",
+        blank=True,
         null=True,
         editable=False,
     )
@@ -144,71 +156,35 @@ class Person(TimeStampedModel):
 
     gender = models.IntegerField(
         choices=GENDER,
+        blank=True,
         null=True,
         editable=False,
-    )
-
-    REPRESENTING = Choices(
-        (110, 'bhs', 'BHS'),
-        (200, 'car', 'CAR'),
-        (205, 'csd', 'CSD'),
-        (210, 'dix', 'DIX'),
-        (215, 'evg', 'EVG'),
-        (220, 'fwd', 'FWD'),
-        (225, 'ill', 'ILL'),
-        (230, 'jad', 'JAD'),
-        (235, 'lol', 'LOL'),
-        (240, 'mad', 'MAD'),
-        (345, 'ned', 'NED'),
-        (350, 'nsc', 'NSC'),
-        (355, 'ont', 'ONT'),
-        (360, 'pio', 'PIO'),
-        (365, 'rmd', 'RMD'),
-        (370, 'sld', 'SLD'),
-        (375, 'sun', 'SUN'),
-        (380, 'swd', 'SWD'),
-    )
-
-    representing = models.IntegerField(
-        choices=REPRESENTING,
-        null=True,
-        blank=True,
-    )
-
-    district = models.CharField(
-        help_text="""
-            District (used primarily for judges.)""",
-        max_length=10,
-        blank=True,
-        default='',
     )
 
     is_deceased = models.BooleanField(
         default=False,
+        blank=True,
         editable=False,
     )
     is_honorary = models.BooleanField(
         default=False,
+        blank=True,
         editable=False,
     )
     is_suspended = models.BooleanField(
         default=False,
+        blank=True,
         editable=False,
     )
     is_expelled = models.BooleanField(
         default=False,
+        blank=True,
         editable=False,
     )
-    website = models.URLField(
-        help_text="""
-            The website URL of the resource.""",
-        blank=True,
-        default='',
-    )
-
     email = LowerEmailField(
         help_text="""
             The contact email of the resource.""",
+        blank=True,
         null=True,
         editable=False,
     )
@@ -216,9 +192,10 @@ class Person(TimeStampedModel):
     address = models.TextField(
         help_text="""
             The complete address of the resource.""",
-        blank=True,
         max_length=1000,
+        blank=True,
         default='',
+        editable=False,
     )
 
     home_phone = PhoneNumberField(
@@ -241,25 +218,29 @@ class Person(TimeStampedModel):
 
     airports = ArrayField(
         base_field=models.CharField(
-            blank=True,
             max_length=3,
+            blank=True,
+            default='',
         ),
-        null=True,
         blank=True,
+        null=True,
+        editable=True,
     )
 
     image = models.ImageField(
         upload_to=ImageUploadPath('image'),
-        null=True,
         blank=True,
+        null=True,
+        editable=True,
     )
 
     description = models.TextField(
         help_text="""
             A bio of the person.  Max 1000 characters.""",
-        blank=True,
         max_length=1000,
+        blank=True,
         default='',
+        editable=True,
     )
 
     notes = models.TextField(
@@ -267,16 +248,18 @@ class Person(TimeStampedModel):
             Notes (for internal use only).""",
         blank=True,
         default='',
+        editable=True,
     )
 
     bhs_id = models.IntegerField(
+        unique=True,
         editable=False,
     )
 
     current_through = models.DateField(
-        editable=False,
-        null=True,
         blank=True,
+        null=True,
+        editable=False,
     )
 
     # Relations
@@ -284,6 +267,7 @@ class Person(TimeStampedModel):
         settings.AUTH_USER_MODEL,
         related_name='persons',
         blank=True,
+        editable=False
     )
 
     statelogs = GenericRelation(
@@ -469,6 +453,7 @@ class Group(TimeStampedModel):
         """,
         max_length=255,
         default='UNKNOWN',
+        editable=False,
     )
 
     STATUS = Choices(
@@ -482,6 +467,7 @@ class Group(TimeStampedModel):
         help_text="""DO NOT CHANGE MANUALLY unless correcting a mistake.  Use the buttons to change state.""",
         choices=STATUS,
         default=STATUS.new,
+        editable=False,
     )
 
     KIND = Choices(
@@ -508,6 +494,7 @@ class Group(TimeStampedModel):
             The kind of group.
         """,
         choices=KIND,
+        editable=False,
     )
 
     GENDER = Choices(
@@ -522,6 +509,7 @@ class Group(TimeStampedModel):
         """,
         choices=GENDER,
         default=GENDER.male,
+        editable=False,
     )
 
     REPRESENTING = Choices(

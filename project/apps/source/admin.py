@@ -11,6 +11,7 @@ from .models import Human
 from .models import Join
 from .models import Membership
 from .models import Role
+from .models import Status
 from .models import Structure
 from .models import Subscription
 
@@ -36,13 +37,31 @@ class ReadOnlyAdmin(admin.ModelAdmin):
 class HumanAdmin(ReadOnlyAdmin):
     fields = [
         'id',
-        ('first_name', 'middle_name', 'last_name', 'nick_name',),
-        ('email', 'bhs_id', 'birth_date',),
-        ('home_phone', 'work_phone', 'cell_phone',),
-        ('part', 'gender',),
-        ('is_deceased', 'is_honorary', 'is_suspended', 'is_expelled',),
-        ('merged_id',),
-        ('created', 'modified',),
+        'username',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'nick_name',
+        'email',
+        'birth_date',
+        'is_deceased',
+        'created',
+        'created_by_id',
+        'modified',
+        'modified_by_id',
+        'deleted',
+        'deleted_by_id',
+        'home_phone',
+        'cell_phone',
+        'work_phone',
+        'bhs_id',
+        'gender',
+        'part',
+        'is_honorary',
+        'is_suspended',
+        'merged_id',
+        'mon',
+        'is_expelled',
     ]
 
     list_display = [
@@ -65,25 +84,31 @@ class HumanAdmin(ReadOnlyAdmin):
 
     readonly_fields = [
         'id',
+        'username',
         'first_name',
         'middle_name',
         'last_name',
         'nick_name',
         'email',
+        'birth_date',
+        'is_deceased',
+        'created',
+        'created_by_id',
+        'modified',
+        'modified_by_id',
+        'deleted',
+        'deleted_by_id',
         'home_phone',
         'cell_phone',
         'work_phone',
         'bhs_id',
-        'birth_date',
         'gender',
         'part',
-        'mon',
-        'is_deceased',
         'is_honorary',
         'is_suspended',
+        'merged_id',
+        'mon',
         'is_expelled',
-        'created',
-        'modified',
     ]
 
     list_filter = [
@@ -109,10 +134,10 @@ class HumanAdmin(ReadOnlyAdmin):
         SubscriptionInline,
     ]
 
-    ordering = (
+    ordering = [
         'last_name',
         'first_name',
-    )
+    ]
 
 
 @admin.register(Structure)
@@ -122,20 +147,43 @@ class StructureAdmin(ReadOnlyAdmin):
         'name',
         'kind',
         'gender',
-        'division',
+        'county',
+        'country',
         'bhs_id',
-        'preferred_name',
         'chapter_code',
-        'phone',
-        'email',
+        'chorus_name',
         'website',
+        'tin',
+        'established_date',
+        'visitor_information',
+        'created',
+        'created_by_id',
+        'modified',
+        'modified_by_id',
+        'deleted',
+        'deleted_by_id',
+        'phone',
+        'phone_ext',
+        'fax',
+        'email',
         'facebook',
         'twitter',
-        'established_date',
-        'status',
+        'youtube',
+        'pinterest',
+        'flickr',
+        'instagram',
+        'soundcloud',
+        'preferred_name',
+        'first_alternate_name',
+        'second_alternate_name',
+        'is_default',
         'parent',
-        'created',
-        'modified',
+        'division',
+        'status',
+        'licenced_date',
+        'chartered_date',
+        'lft',
+        'rght',
     ]
 
     list_display = [
@@ -160,20 +208,43 @@ class StructureAdmin(ReadOnlyAdmin):
         'name',
         'kind',
         'gender',
-        'division',
+        'county',
+        'country',
         'bhs_id',
-        'preferred_name',
         'chapter_code',
-        'phone',
-        'email',
+        'chorus_name',
         'website',
+        'tin',
+        'established_date',
+        'visitor_information',
+        'created',
+        'created_by_id',
+        'modified',
+        'modified_by_id',
+        'deleted',
+        'deleted_by_id',
+        'phone',
+        'phone_ext',
+        'fax',
+        'email',
         'facebook',
         'twitter',
-        'established_date',
-        'status',
+        'youtube',
+        'pinterest',
+        'flickr',
+        'instagram',
+        'soundcloud',
+        'preferred_name',
+        'first_alternate_name',
+        'second_alternate_name',
+        'is_default',
         'parent',
-        'created',
-        'modified',
+        'division',
+        'status',
+        'licenced_date',
+        'chartered_date',
+        'lft',
+        'rght',
     ]
 
     list_filter = [
@@ -189,6 +260,7 @@ class StructureAdmin(ReadOnlyAdmin):
 
     list_select_related = [
         'parent',
+        'status',
     ]
 
     ordering = (
@@ -239,14 +311,45 @@ class StructureAdmin(ReadOnlyAdmin):
             yield inline.get_formset(request, obj)
 
 
+@admin.register(Status)
+class StatusAdmin(ReadOnlyAdmin):
+    fields = [
+        'id',
+        'name',
+        'label',
+        'non_admin_view',
+        'non_admin_join',
+        'renewable',
+        'entities',
+    ]
+    readonly_fields = [
+        'id',
+        'name',
+        'label',
+        'non_admin_view',
+        'non_admin_join',
+        'renewable',
+        'entities',
+    ]
+
+
 @admin.register(Membership)
 class MembershipAdmin(ReadOnlyAdmin):
     fields = [
+        'object_type',
         'structure',
+        'months',
+        'is_auto_renew',
+        'type',
         'code',
-        'status',
+        'membership_options_id',
+        'effective_date',
         'created',
+        'created_by_id',
+        'deleted',
+        'deleted_by_id',
         'modified',
+        'status',
     ]
 
     list_display = [
@@ -268,11 +371,20 @@ class MembershipAdmin(ReadOnlyAdmin):
     ]
 
     readonly_fields = [
+        'object_type',
         'structure',
+        'months',
+        'is_auto_renew',
+        'type',
         'code',
-        'status',
+        'membership_options_id',
+        'effective_date',
         'created',
+        'created_by_id',
+        'deleted',
+        'deleted_by_id',
         'modified',
+        'status',
     ]
 
     inlines = [
@@ -292,12 +404,17 @@ class MembershipAdmin(ReadOnlyAdmin):
 @admin.register(Subscription)
 class SubscriptionAdmin(ReadOnlyAdmin):
     fields = [
-        '__str__',
-        'items_editable',
-        'current_through',
-        'status',
-        'created',
+        'id',
+        'members_entities_id',
         'modified',
+        'current_through',
+        'memberships_id',
+        'created',
+        'status',
+        'human',
+        'join_date',
+        'items_editable',
+        'deleted',
     ]
 
     list_display = [
@@ -309,13 +426,18 @@ class SubscriptionAdmin(ReadOnlyAdmin):
         'modified',
     ]
 
-    readonly_fields = [
-        '__str__',
-        'items_editable',
-        'current_through',
-        'status',
-        'created',
+    fields = [
+        'id',
+        'members_entities_id',
         'modified',
+        'current_through',
+        'memberships_id',
+        'created',
+        'status',
+        'human',
+        'join_date',
+        'items_editable',
+        'deleted',
     ]
 
     list_filter = [
@@ -339,13 +461,15 @@ class SubscriptionAdmin(ReadOnlyAdmin):
 @admin.register(Role)
 class RoleAdmin(ReadOnlyAdmin):
     fields = [
-        'name',
-        'human',
+        'id',
+        'object_type',
         'structure',
+        'officer_roles_id',
+        'name',
+        'abbv',
         'start_date',
         'end_date',
-        'abbv',
-        'officer_roles_id',
+        'human',
         'created',
         'modified',
     ]
@@ -370,16 +494,19 @@ class RoleAdmin(ReadOnlyAdmin):
     ]
 
     readonly_fields = [
-        'name',
-        'human',
+        'id',
+        'object_type',
         'structure',
+        'officer_roles_id',
+        'name',
+        'abbv',
         'start_date',
         'end_date',
-        'abbv',
-        'officer_roles_id',
+        'human',
         'created',
         'modified',
     ]
+
 
     ordering = (
         'structure__name',
@@ -397,16 +524,18 @@ class RoleAdmin(ReadOnlyAdmin):
 class JoinAdmin(ReadOnlyAdmin):
     fields = [
         'id',
-        'status',
-        'paid',
-        'part',
         'subscription',
         'membership',
+        'status',
         'established_date',
         'inactive_date',
         'inactive_reason',
-        'created',
+        'paid',
+        'part',
+        'structure',
         'modified',
+        'created',
+        'deleted',
     ]
 
     list_display = [
@@ -429,16 +558,18 @@ class JoinAdmin(ReadOnlyAdmin):
     ]
     readonly_fields = [
         'id',
-        'status',
-        'paid',
         'subscription',
         'membership',
-        'part',
+        'status',
+        'established_date',
         'inactive_date',
         'inactive_reason',
-        'established_date',
-        'created',
+        'paid',
+        'part',
+        'structure',
         'modified',
+        'created',
+        'deleted',
     ]
 
     list_display_links = [

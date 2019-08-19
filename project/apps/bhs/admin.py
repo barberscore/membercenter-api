@@ -7,7 +7,7 @@ from reversion.admin import VersionAdmin
 from django.contrib import admin
 
 # Local
-from .inlines import MemberInline
+# from .inlines import MemberInline
 from .inlines import OfficerInline
 from .models import Group
 from .models import Member
@@ -78,23 +78,48 @@ class GroupAdmin(VersionAdmin, FSMTransitionMixin):
     ]
     list_select_related = [
         'parent',
+        'status',
+        'owners',
     ]
-    readonly_fields = [
-        'id',
-        'created',
-        'modified',
-    ]
+    # readonly_fields = [
+    #     'id',
+    #     'status',
+    #     'prefix',
+    #     'first_name',
+    #     'middle_name',
+    #     'last_name',
+    #     'nick_name',
+    #     'suffix',
+    #     'birth_date',
+    #     'part',
+    #     'mon',
+    #     'gender',
+    #     'is_deceased',
+    #     'is_honorary',
+    #     'is_suspended',
+    #     'is_expelled',
+    #     'email',
+    #     'address',
+    #     'home_phone',
+    #     'work_phone',
+    #     'cell_phone',
+    #     'bhs_id',
+    #     'current_through',
+    #     'created',
+    #     'modified',
+    #     'owners',
+    # ]
 
     autocomplete_fields = [
-        'owners',
+        # 'owners',
         # 'parent',
     ]
     raw_id_fields = [
-        'parent',
+        # 'parent',
     ]
 
     ordering = [
-        'tree_sort',
+        # 'tree_sort',
     ]
 
     INLINES = {
@@ -146,6 +171,12 @@ class GroupAdmin(VersionAdmin, FSMTransitionMixin):
             StateLogInline,
         ],
     }
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
     def get_inline_instances(self, request, obj=None):
         inline_instances = []
@@ -243,6 +274,15 @@ class MemberAdmin(VersionAdmin, FSMTransitionMixin):
         StateLogInline,
     ]
 
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
 
 @admin.register(Officer)
 class OfficerAdmin(VersionAdmin, FSMTransitionMixin):
@@ -294,6 +334,14 @@ class OfficerAdmin(VersionAdmin, FSMTransitionMixin):
         'person__last_name',
         'person__first_name',
     ]
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(Person)
@@ -309,8 +357,6 @@ class PersonAdmin(VersionAdmin, FSMTransitionMixin):
         ('is_deceased', 'is_honorary', 'is_suspended', 'is_expelled',),
         'spouse',
         'location',
-        'representing',
-        'website',
         'image',
         'description',
         'notes',
@@ -344,28 +390,31 @@ class PersonAdmin(VersionAdmin, FSMTransitionMixin):
 
     readonly_fields = [
         'id',
+        'status',
+        'prefix',
         'first_name',
         'middle_name',
         'last_name',
         'nick_name',
-        'email',
-        'current_through',
-        'is_deceased',
-        'bhs_id',
+        'suffix',
         'birth_date',
         'part',
         'mon',
         'gender',
-        'home_phone',
-        'work_phone',
-        'cell_phone',
-        'common_name',
         'is_deceased',
         'is_honorary',
         'is_suspended',
         'is_expelled',
+        'email',
+        'address',
+        'home_phone',
+        'work_phone',
+        'cell_phone',
+        'bhs_id',
+        'current_through',
         'created',
         'modified',
+        'owners',
     ]
 
     fsm_field = [
@@ -401,3 +450,8 @@ class PersonAdmin(VersionAdmin, FSMTransitionMixin):
     # readonly_fields = [
     #     'common_name',
     # ]
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
