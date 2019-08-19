@@ -479,14 +479,14 @@ class GroupManager(Manager):
             'SUN': self.model.REPRESENTING.sun,
             'SWD': self.model.REPRESENTING.swd,
         }
-        representing = representing_map.get(representing_raw, None)
+        district = representing_map.get(representing_raw, None)
 
         defaults = {
             'status': status,
             'name': name,
             'kind': kind,
             'gender': gender,
-            'representing': representing,
+            'district': district,
             'division': division,
             'bhs_id': bhs_id,
             'code': legacy_code,
