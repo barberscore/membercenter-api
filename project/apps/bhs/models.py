@@ -35,411 +35,6 @@ from .managers import OfficerManager
 from .managers import PersonManager
 
 
-class Person(TimeStampedModel):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-    )
-
-    STATUS = Choices(
-        (-10, 'inactive', 'Inactive',),
-        (0, 'new', 'New',),
-        (10, 'active', 'Active',),
-    )
-
-    status = FSMIntegerField(
-        help_text="""DO NOT CHANGE MANUALLY unless correcting a mistake.  Use the buttons to change state.""",
-        choices=STATUS,
-        default=STATUS.active,
-        editable=False,
-    )
-
-    prefix = models.CharField(
-        help_text="""
-            The prefix of the person.""",
-        max_length=255,
-        blank=True,
-        default='',
-        editable=False,
-    )
-
-    first_name = models.CharField(
-        help_text="""
-            The first name of the person.""",
-        max_length=255,
-        editable=False,
-    )
-
-    middle_name = models.CharField(
-        help_text="""
-            The middle name of the person.""",
-        max_length=255,
-        blank=True,
-        default='',
-        editable=False,
-    )
-
-    last_name = models.CharField(
-        help_text="""
-            The last name of the person.""",
-        max_length=255,
-        editable=False,
-    )
-
-    nick_name = models.CharField(
-        help_text="""
-            The nickname of the person.""",
-        max_length=255,
-        blank=True,
-        default='',
-        editable=False,
-    )
-
-    suffix = models.CharField(
-        help_text="""
-            The suffix of the person.""",
-        max_length=255,
-        blank=True,
-        default='',
-        editable=False,
-    )
-
-    birth_date = models.DateField(
-        blank=True,
-        null=True,
-        editable=False,
-    )
-
-    spouse = models.CharField(
-        max_length=255,
-        blank=True,
-        default='',
-        editable=True,
-    )
-
-    location = models.CharField(
-        help_text="""
-            The geographical location of the resource.""",
-        max_length=255,
-        blank=True,
-        default='',
-        editable=True,
-    )
-
-    PART = Choices(
-        (1, 'tenor', 'Tenor'),
-        (2, 'lead', 'Lead'),
-        (3, 'baritone', 'Baritone'),
-        (4, 'bass', 'Bass'),
-    )
-
-    part = models.IntegerField(
-        choices=PART,
-        blank=True,
-        null=True,
-        editable=False,
-    )
-
-    mon = models.IntegerField(
-        help_text="""
-            Men of Note.""",
-        blank=True,
-        null=True,
-        editable=False,
-    )
-
-    GENDER = Choices(
-        (10, 'male', 'Male'),
-        (20, 'female', 'Female'),
-    )
-
-    gender = models.IntegerField(
-        choices=GENDER,
-        blank=True,
-        null=True,
-        editable=False,
-    )
-
-    is_deceased = models.BooleanField(
-        default=False,
-        blank=True,
-        editable=False,
-    )
-    is_honorary = models.BooleanField(
-        default=False,
-        blank=True,
-        editable=False,
-    )
-    is_suspended = models.BooleanField(
-        default=False,
-        blank=True,
-        editable=False,
-    )
-    is_expelled = models.BooleanField(
-        default=False,
-        blank=True,
-        editable=False,
-    )
-    email = LowerEmailField(
-        help_text="""
-            The contact email of the resource.""",
-        blank=True,
-        null=True,
-        editable=False,
-    )
-
-    address = models.TextField(
-        help_text="""
-            The complete address of the resource.""",
-        max_length=1000,
-        blank=True,
-        default='',
-        editable=False,
-    )
-
-    home_phone = PhoneNumberField(
-        help_text="""
-            The home phone number of the resource.  Include country code.""",
-        editable=False,
-    )
-
-    work_phone = PhoneNumberField(
-        help_text="""
-            The work phone number of the resource.  Include country code.""",
-        editable=False,
-    )
-
-    cell_phone = PhoneNumberField(
-        help_text="""
-            The cell phone number of the resource.  Include country code.""",
-        editable=False,
-    )
-
-    airports = ArrayField(
-        base_field=models.CharField(
-            max_length=3,
-            blank=True,
-            default='',
-        ),
-        blank=True,
-        null=True,
-        editable=True,
-    )
-
-    image = models.ImageField(
-        upload_to=ImageUploadPath('image'),
-        blank=True,
-        null=True,
-        editable=True,
-    )
-
-    description = models.TextField(
-        help_text="""
-            A bio of the person.  Max 1000 characters.""",
-        max_length=1000,
-        blank=True,
-        default='',
-        editable=True,
-    )
-
-    notes = models.TextField(
-        help_text="""
-            Notes (for internal use only).""",
-        blank=True,
-        default='',
-        editable=True,
-    )
-
-    bhs_id = models.IntegerField(
-        unique=True,
-        editable=False,
-    )
-
-    current_through = models.DateField(
-        blank=True,
-        null=True,
-        editable=False,
-    )
-
-    # Relations
-    owners = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        related_name='persons',
-        blank=True,
-        editable=False
-    )
-
-    statelogs = GenericRelation(
-        StateLog,
-        related_query_name='persons',
-    )
-
-    # Properties
-    def is_active(self):
-        # For Algolia indexing
-        return bool(
-            self.officers.filter(
-                status__gt=0,
-            )
-        )
-
-    @cached_property
-    def usernames(self):
-        return [x.username for x in self.owners.all()]
-
-    @cached_property
-    def nomen(self):
-        if self.nick_name:
-            nick = "({0})".format(self.nick_name)
-        else:
-            nick = ""
-        if self.bhs_id:
-            suffix = "[{0}]".format(self.bhs_id)
-        else:
-            suffix = "[No BHS ID]"
-        full = "{0} {1} {2} {3} {4}".format(
-            self.first_name,
-            self.middle_name,
-            self.last_name,
-            nick,
-            suffix,
-        )
-        return " ".join(full.split())
-
-    @cached_property
-    def name(self):
-        return self.common_name
-
-    @cached_property
-    def full_name(self):
-        if self.nick_name:
-            nick = "({0})".format(self.nick_name)
-        else:
-            nick = ""
-        full = "{0} {1} {2} {3}".format(
-            self.first_name,
-            self.middle_name,
-            self.last_name,
-            nick,
-        )
-        return " ".join(full.split())
-
-    @cached_property
-    def common_name(self):
-        if self.nick_name:
-            first = self.nick_name
-        else:
-            first = self.first_name
-        return "{0} {1}".format(first, self.last_name)
-
-    @cached_property
-    def sort_name(self):
-        return "{0}, {1}".format(self.last_name, self.first_name)
-
-    @cached_property
-    def initials(self):
-        one = self.nick_name or self.first_name
-        two = str(self.last_name)
-        if not (one and two):
-            return "--"
-        return "{0}{1}".format(
-            one[0].upper(),
-            two[0].upper(),
-        )
-
-    @cached_property
-    def image_id(self):
-        return self.image.name or 'missing_image'
-
-    def image_url(self):
-        try:
-            return self.image.url
-        except ValueError:
-            return 'https://res.cloudinary.com/barberscore/image/upload/v1554830585/missing_image.jpg'
-
-    # @cached_property
-    # def current_through(self):
-    #     try:
-    #         current_through = self.members.get(
-    #             group__bhs_id=1,
-    #         ).end_date
-    #     except self.members.model.DoesNotExist:
-    #         current_through = None
-    #     return current_through
-
-    # @cached_property
-    # def current_status(self):
-    #     today = now().date()
-    #     if self.current_through:
-    #         if self.current_through >= today:
-    #             return True
-    #         return False
-    #     return True
-
-    # @cached_property
-    # def current_district(self):
-    #     return bool(
-    #         self.members.filter(
-    #             group__kind=11, # hardcoded for convenience
-    #             status__gt=0,
-    #         )
-    #     )
-
-    # Internals
-    objects = PersonManager()
-
-    class Meta:
-        verbose_name_plural = 'Persons'
-
-    class JSONAPIMeta:
-        resource_name = "person"
-
-    def clean(self):
-        pass
-
-    def __str__(self):
-        return self.nomen
-
-    # Permissions
-    @staticmethod
-    @allow_staff_or_superuser
-    @authenticated_users
-    def has_read_permission(request):
-        return True
-
-    @allow_staff_or_superuser
-    @authenticated_users
-    def has_object_read_permission(self, request):
-        return True
-
-    @staticmethod
-    @allow_staff_or_superuser
-    @authenticated_users
-    def has_write_permission(request):
-        return False
-
-    @allow_staff_or_superuser
-    @authenticated_users
-    def has_object_write_permission(self, request):
-        return False
-
-    # Transitions
-    @fsm_log_by
-    @fsm_log_description
-    @transition(field=status, source='*', target=STATUS.active)
-    def activate(self, description=None, *args, **kwargs):
-        """Activate the Person."""
-        return
-
-    @fsm_log_by
-    @fsm_log_description
-    @transition(field=status, source='*', target=STATUS.inactive)
-    def deactivate(self, description=None, *args, **kwargs):
-        """Deactivate the Person."""
-        return
-
-
 class Group(TimeStampedModel):
     id = models.UUIDField(
         primary_key=True,
@@ -512,7 +107,7 @@ class Group(TimeStampedModel):
         editable=False,
     )
 
-    REPRESENTING = Choices(
+    DISTRICT = Choices(
         (110, 'bhs', 'BHS'),
         (200, 'car', 'CAR'),
         (205, 'csd', 'CSD'),
@@ -533,10 +128,11 @@ class Group(TimeStampedModel):
         (380, 'swd', 'SWD'),
     )
 
-    representing = models.IntegerField(
-        choices=REPRESENTING,
-        null=True,
+    district = models.IntegerField(
+        choices=DISTRICT,
         blank=True,
+        null=True,
+        editable=False,
     )
 
     DIVISION = Choices(
@@ -585,14 +181,16 @@ class Group(TimeStampedModel):
 
     division = models.IntegerField(
         choices=DIVISION,
-        null=True,
         blank=True,
+        null=True,
+        editable=False,
     )
 
     bhs_id = models.IntegerField(
+        unique=True,
         blank=True,
         null=True,
-        unique=True,
+        editable=False,
     )
 
     code = models.CharField(
@@ -600,6 +198,8 @@ class Group(TimeStampedModel):
             Short-form code.""",
         max_length=255,
         blank=True,
+        default='',
+        editable=False,
     )
 
     website = models.URLField(
@@ -607,37 +207,43 @@ class Group(TimeStampedModel):
             The website URL of the resource.""",
         blank=True,
         default='',
+        editable=False,
     )
 
     email = LowerEmailField(
         help_text="""
             The contact email of the resource.""",
-        blank=True,
         null=True,
+        blank=True,
+        editable=False,
     )
 
-    phone = models.CharField(
+    phone = PhoneNumberField(
         help_text="""
             The phone number of the resource.  Include country code.""",
         blank=True,
-        max_length=25,
+        default='',
+        editable=False,
     )
 
-    fax_phone = models.CharField(
+    fax_phone = PhoneNumberField(
         help_text="""
             The fax number of the resource.  Include country code.""",
         blank=True,
-        max_length=25,
+        default='',
+        editable=False,
     )
 
     start_date = models.DateField(
-        null=True,
         blank=True,
+        null=True,
+        editable=False,
     )
 
     end_date = models.DateField(
-        null=True,
         blank=True,
+        null=True,
+        editable=False,
     )
 
     location = models.CharField(
@@ -645,18 +251,24 @@ class Group(TimeStampedModel):
             The geographical location of the resource.""",
         max_length=255,
         blank=True,
+        default='',
+        editable=True,
     )
 
     facebook = models.URLField(
         help_text="""
             The facebook URL of the resource.""",
         blank=True,
+        default='',
+        editable=False,
     )
 
     twitter = models.URLField(
         help_text="""
             The twitter URL of the resource.""",
         blank=True,
+        default='',
+        editable=False,
     )
 
     youtube = models.URLField(
@@ -664,6 +276,7 @@ class Group(TimeStampedModel):
             The youtube URL of the resource.""",
         blank=True,
         default='',
+        editable=False,
     )
 
     pinterest = models.URLField(
@@ -671,6 +284,7 @@ class Group(TimeStampedModel):
             The pinterest URL of the resource.""",
         blank=True,
         default='',
+        editable=False,
     )
 
     flickr = models.URLField(
@@ -678,6 +292,7 @@ class Group(TimeStampedModel):
             The flickr URL of the resource.""",
         blank=True,
         default='',
+        editable=False,
     )
 
     instagram = models.URLField(
@@ -685,6 +300,7 @@ class Group(TimeStampedModel):
             The instagram URL of the resource.""",
         blank=True,
         default='',
+        editable=False,
     )
 
     soundcloud = models.URLField(
@@ -692,25 +308,30 @@ class Group(TimeStampedModel):
             The soundcloud URL of the resource.""",
         blank=True,
         default='',
+        editable=False,
     )
 
     image = models.ImageField(
         upload_to=ImageUploadPath('image'),
-        null=True,
         blank=True,
+        default='',
+        editable=True,
     )
 
     description = models.TextField(
         help_text="""
             A description of the group.  Max 1000 characters.""",
-        blank=True,
         max_length=1000,
+        blank=True,
+        default='',
+        editable=True,
     )
 
     visitor_information = models.TextField(
         max_length=255,
         blank=True,
         default='',
+        editable=False,
     )
 
     participants = models.CharField(
@@ -718,22 +339,41 @@ class Group(TimeStampedModel):
         max_length=255,
         blank=True,
         default='',
+        editable=True,
     )
 
     chapters = models.CharField(
         help_text="""
             The denormalized chapter group.""",
-        blank=True,
         max_length=255,
+        blank=True,
+        default='',
+        editable=True,
     )
 
     notes = models.TextField(
         help_text="""
             Notes (for internal use only).""",
         blank=True,
+        default='',
+        editable=True,
     )
 
-    # Denormalizations
+    is_senior = models.BooleanField(
+        help_text="""Qualifies as a Senior Group.  Must be set manually.""",
+        blank=True,
+        default=False,
+        editable=True,
+    )
+
+    is_youth = models.BooleanField(
+        help_text="""Qualifies as a Youth Group.  Must be set manually.""",
+        blank=True,
+        default=False,
+        editable=True,
+    )
+
+    # Denormalization
     tree_sort = models.IntegerField(
         unique=True,
         blank=True,
@@ -741,41 +381,22 @@ class Group(TimeStampedModel):
         editable=False,
     )
 
-    district = models.TextField(
-        help_text="""
-            The denormalized district group.""",
-        blank=True,
-        max_length=255,
-    )
-
-    is_senior = models.BooleanField(
-        help_text="""Qualifies as a Senior Group.  This can be set manually, but is denormlized nightly for quartets.""",
-        default=False,
-    )
-
-    is_youth = models.BooleanField(
-        help_text="""Qualifies as a Youth Group.  Must be set manually.""",
-        default=False,
-    )
-
-    is_divided = models.BooleanField(
-        help_text="""This district has divisions.""",
-        default=False,
-    )
-
     # FKs
     owners = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name='groups',
+        blank=True,
+        editable=False,
     )
 
     parent = models.ForeignKey(
         'Group',
-        null=True,
         blank=True,
+        null=True,
         related_name='children',
         db_index=True,
         on_delete=models.SET_NULL,
+        editable=False,
     )
 
     # Relations
@@ -1339,4 +960,409 @@ class Officer(TimeStampedModel):
     @fsm_log_description
     @transition(field=status, source='*', target=STATUS.inactive)
     def deactivate(self, description=None, *args, **kwargs):
+        return
+
+
+class Person(TimeStampedModel):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+
+    STATUS = Choices(
+        (-10, 'inactive', 'Inactive',),
+        (0, 'new', 'New',),
+        (10, 'active', 'Active',),
+    )
+
+    status = FSMIntegerField(
+        help_text="""DO NOT CHANGE MANUALLY unless correcting a mistake.  Use the buttons to change state.""",
+        choices=STATUS,
+        default=STATUS.active,
+        editable=False,
+    )
+
+    prefix = models.CharField(
+        help_text="""
+            The prefix of the person.""",
+        max_length=255,
+        blank=True,
+        default='',
+        editable=False,
+    )
+
+    first_name = models.CharField(
+        help_text="""
+            The first name of the person.""",
+        max_length=255,
+        editable=False,
+    )
+
+    middle_name = models.CharField(
+        help_text="""
+            The middle name of the person.""",
+        max_length=255,
+        blank=True,
+        default='',
+        editable=False,
+    )
+
+    last_name = models.CharField(
+        help_text="""
+            The last name of the person.""",
+        max_length=255,
+        editable=False,
+    )
+
+    nick_name = models.CharField(
+        help_text="""
+            The nickname of the person.""",
+        max_length=255,
+        blank=True,
+        default='',
+        editable=False,
+    )
+
+    suffix = models.CharField(
+        help_text="""
+            The suffix of the person.""",
+        max_length=255,
+        blank=True,
+        default='',
+        editable=False,
+    )
+
+    birth_date = models.DateField(
+        blank=True,
+        null=True,
+        editable=False,
+    )
+
+    spouse = models.CharField(
+        max_length=255,
+        blank=True,
+        default='',
+        editable=True,
+    )
+
+    location = models.CharField(
+        help_text="""
+            The geographical location of the resource.""",
+        max_length=255,
+        blank=True,
+        default='',
+        editable=True,
+    )
+
+    PART = Choices(
+        (1, 'tenor', 'Tenor'),
+        (2, 'lead', 'Lead'),
+        (3, 'baritone', 'Baritone'),
+        (4, 'bass', 'Bass'),
+    )
+
+    part = models.IntegerField(
+        choices=PART,
+        blank=True,
+        null=True,
+        editable=False,
+    )
+
+    mon = models.IntegerField(
+        help_text="""
+            Men of Note.""",
+        blank=True,
+        null=True,
+        editable=False,
+    )
+
+    GENDER = Choices(
+        (10, 'male', 'Male'),
+        (20, 'female', 'Female'),
+    )
+
+    gender = models.IntegerField(
+        choices=GENDER,
+        blank=True,
+        null=True,
+        editable=False,
+    )
+
+    is_deceased = models.BooleanField(
+        default=False,
+        blank=True,
+        editable=False,
+    )
+    is_honorary = models.BooleanField(
+        default=False,
+        blank=True,
+        editable=False,
+    )
+    is_suspended = models.BooleanField(
+        default=False,
+        blank=True,
+        editable=False,
+    )
+    is_expelled = models.BooleanField(
+        default=False,
+        blank=True,
+        editable=False,
+    )
+    email = LowerEmailField(
+        help_text="""
+            The contact email of the resource.""",
+        blank=True,
+        null=True,
+        editable=False,
+    )
+
+    address = models.TextField(
+        help_text="""
+            The complete address of the resource.""",
+        max_length=1000,
+        blank=True,
+        default='',
+        editable=False,
+    )
+
+    home_phone = PhoneNumberField(
+        help_text="""
+            The home phone number of the resource.  Include country code.""",
+        editable=False,
+    )
+
+    work_phone = PhoneNumberField(
+        help_text="""
+            The work phone number of the resource.  Include country code.""",
+        editable=False,
+    )
+
+    cell_phone = PhoneNumberField(
+        help_text="""
+            The cell phone number of the resource.  Include country code.""",
+        editable=False,
+    )
+
+    airports = ArrayField(
+        base_field=models.CharField(
+            max_length=3,
+            blank=True,
+            default='',
+        ),
+        blank=True,
+        null=True,
+        editable=True,
+    )
+
+    image = models.ImageField(
+        upload_to=ImageUploadPath('image'),
+        blank=True,
+        null=True,
+        editable=True,
+    )
+
+    description = models.TextField(
+        help_text="""
+            A bio of the person.  Max 1000 characters.""",
+        max_length=1000,
+        blank=True,
+        default='',
+        editable=True,
+    )
+
+    notes = models.TextField(
+        help_text="""
+            Notes (for internal use only).""",
+        blank=True,
+        default='',
+        editable=True,
+    )
+
+    bhs_id = models.IntegerField(
+        unique=True,
+        editable=False,
+    )
+
+    current_through = models.DateField(
+        blank=True,
+        null=True,
+        editable=False,
+    )
+
+    # Relations
+    owners = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name='persons',
+        blank=True,
+        editable=False
+    )
+
+    statelogs = GenericRelation(
+        StateLog,
+        related_query_name='persons',
+    )
+
+    # Properties
+    def is_active(self):
+        # For Algolia indexing
+        return bool(
+            self.officers.filter(
+                status__gt=0,
+            )
+        )
+
+    @cached_property
+    def usernames(self):
+        return [x.username for x in self.owners.all()]
+
+    @cached_property
+    def nomen(self):
+        if self.nick_name:
+            nick = "({0})".format(self.nick_name)
+        else:
+            nick = ""
+        if self.bhs_id:
+            suffix = "[{0}]".format(self.bhs_id)
+        else:
+            suffix = "[No BHS ID]"
+        full = "{0} {1} {2} {3} {4}".format(
+            self.first_name,
+            self.middle_name,
+            self.last_name,
+            nick,
+            suffix,
+        )
+        return " ".join(full.split())
+
+    @cached_property
+    def name(self):
+        return self.common_name
+
+    @cached_property
+    def full_name(self):
+        if self.nick_name:
+            nick = "({0})".format(self.nick_name)
+        else:
+            nick = ""
+        full = "{0} {1} {2} {3}".format(
+            self.first_name,
+            self.middle_name,
+            self.last_name,
+            nick,
+        )
+        return " ".join(full.split())
+
+    @cached_property
+    def common_name(self):
+        if self.nick_name:
+            first = self.nick_name
+        else:
+            first = self.first_name
+        return "{0} {1}".format(first, self.last_name)
+
+    @cached_property
+    def sort_name(self):
+        return "{0}, {1}".format(self.last_name, self.first_name)
+
+    @cached_property
+    def initials(self):
+        one = self.nick_name or self.first_name
+        two = str(self.last_name)
+        if not (one and two):
+            return "--"
+        return "{0}{1}".format(
+            one[0].upper(),
+            two[0].upper(),
+        )
+
+    @cached_property
+    def image_id(self):
+        return self.image.name or 'missing_image'
+
+    def image_url(self):
+        try:
+            return self.image.url
+        except ValueError:
+            return 'https://res.cloudinary.com/barberscore/image/upload/v1554830585/missing_image.jpg'
+
+    # @cached_property
+    # def current_through(self):
+    #     try:
+    #         current_through = self.members.get(
+    #             group__bhs_id=1,
+    #         ).end_date
+    #     except self.members.model.DoesNotExist:
+    #         current_through = None
+    #     return current_through
+
+    # @cached_property
+    # def current_status(self):
+    #     today = now().date()
+    #     if self.current_through:
+    #         if self.current_through >= today:
+    #             return True
+    #         return False
+    #     return True
+
+    # @cached_property
+    # def current_district(self):
+    #     return bool(
+    #         self.members.filter(
+    #             group__kind=11, # hardcoded for convenience
+    #             status__gt=0,
+    #         )
+    #     )
+
+    # Internals
+    objects = PersonManager()
+
+    class Meta:
+        verbose_name_plural = 'Persons'
+
+    class JSONAPIMeta:
+        resource_name = "person"
+
+    def clean(self):
+        pass
+
+    def __str__(self):
+        return self.nomen
+
+    # Permissions
+    @staticmethod
+    @allow_staff_or_superuser
+    @authenticated_users
+    def has_read_permission(request):
+        return True
+
+    @allow_staff_or_superuser
+    @authenticated_users
+    def has_object_read_permission(self, request):
+        return True
+
+    @staticmethod
+    @allow_staff_or_superuser
+    @authenticated_users
+    def has_write_permission(request):
+        return False
+
+    @allow_staff_or_superuser
+    @authenticated_users
+    def has_object_write_permission(self, request):
+        return False
+
+    # Transitions
+    @fsm_log_by
+    @fsm_log_description
+    @transition(field=status, source='*', target=STATUS.active)
+    def activate(self, description=None, *args, **kwargs):
+        """Activate the Person."""
+        return
+
+    @fsm_log_by
+    @fsm_log_description
+    @transition(field=status, source='*', target=STATUS.inactive)
+    def deactivate(self, description=None, *args, **kwargs):
+        """Deactivate the Person."""
         return
