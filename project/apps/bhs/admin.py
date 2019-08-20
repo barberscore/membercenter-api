@@ -67,17 +67,14 @@ class GroupAdmin(VersionAdmin, FSMTransitionMixin):
         'name',
         'kind',
         'gender',
-        'is_senior',
-        'is_youth',
         'district',
         'division',
-        'parent',
         'bhs_id',
         'code',
         'status',
     ]
     list_select_related = [
-        'parent',
+        # 'parent',
         # 'owners',
     ]
     readonly_fields = [
@@ -119,7 +116,7 @@ class GroupAdmin(VersionAdmin, FSMTransitionMixin):
     ]
 
     ordering = [
-        # 'tree_sort',
+        'tree_sort',
     ]
 
     INLINES = {
@@ -200,7 +197,7 @@ class GroupAdmin(VersionAdmin, FSMTransitionMixin):
         ).prefetch_related('members')
 
 
-@admin.register(Member)
+# @admin.register(Member)
 class MemberAdmin(VersionAdmin, FSMTransitionMixin):
     fsm_field = [
         'status',
@@ -284,7 +281,7 @@ class MemberAdmin(VersionAdmin, FSMTransitionMixin):
         return False
 
 
-@admin.register(Officer)
+# @admin.register(Officer)
 class OfficerAdmin(VersionAdmin, FSMTransitionMixin):
     fsm_field = [
         'status',
