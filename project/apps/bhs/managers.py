@@ -10,8 +10,10 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.db.models import Manager
-from django.core.validators import validate_email
+# from django.core.validators import validate_email
 from .validators import validate_url
+from .validators import validate_phone
+from .validators import validate_email
 
 User = get_user_model()
 
@@ -19,54 +21,31 @@ User = get_user_model()
 class GroupManager(Manager):
     def update_or_create_from_structure(self, structure):
         # Extract
-        if isinstance(structure, dict):
-            mc_pk = structure['id']
-            name = structure['name']
-            kind = structure['kind']
-            gender = structure['gender']
-            division = structure['division']
-            bhs_id = structure['bhs_id']
-            legacy_code = structure['chapter_code']
-            website = structure['website']
-            email = structure['email']
-            main_phone = structure['phone']
-            fax_phone = structure['fax']
-            facebook = structure['facebook']
-            twitter = structure['twitter']
-            youtube = structure['youtube']
-            pinterest = structure['pinterest']
-            flickr = structure['flickr']
-            instagram = structure['instagram']
-            soundcloud = structure['soundcloud']
-            preferred_name = structure['preferred_name']
-            visitor_information = structure['visitor_information']
-            established_date = structure['established_date']
-            status_id = structure['status_id']
-            parent_pk = structure['parent_id']
-        else:
-            mc_pk = str(structure.id)
-            name = structure.name
-            kind = structure.kind
-            gender = structure.gender
-            division = structure.division
-            bhs_id = structure.bhs_id
-            legacy_code = structure.chapter_code
-            website = structure.website
-            email = structure.email
-            main_phone = structure.phone
-            fax_phone = structure.fax
-            facebook = structure.facebook
-            twitter = structure.twitter
-            youtube = structure.youtube
-            pinterest = structure.pinterest
-            flickr = structure.flickr
-            instagram = structure.instagram
-            soundcloud = structure.soundcloud
-            preferred_name = structure.preferred_name
-            visitor_information = structure.visitor_information
-            established_date = structure.established_date
-            status_id = structure.status_id
-            parent_pk = structure.parent_id
+        if not isinstance(structure, dict):
+            raise ValueError("Must be dict")
+        mc_pk = structure['id']
+        name = structure['name']
+        kind = structure['kind']
+        gender = structure['gender']
+        division = structure['division']
+        bhs_id = structure['bhs_id']
+        legacy_code = structure['chapter_code']
+        website = structure['website']
+        email = structure['email']
+        main_phone = structure['phone']
+        fax_phone = structure['fax']
+        facebook = structure['facebook']
+        twitter = structure['twitter']
+        youtube = structure['youtube']
+        pinterest = structure['pinterest']
+        flickr = structure['flickr']
+        instagram = structure['instagram']
+        soundcloud = structure['soundcloud']
+        preferred_name = structure['preferred_name']
+        visitor_information = structure['visitor_information']
+        established_date = structure['established_date']
+        status_id = structure['status_id']
+        parent_pk = structure['parent_id']
 
 
         # Transform
@@ -207,6 +186,49 @@ class GroupManager(Manager):
         }
         gender = gender_map.get(gender, self.model.GENDER.male)
 
+        if parent_pk:
+            parent = self.get(
+                id=parent_pk,
+            )
+        else:
+            parent = None
+
+        if parent:
+            if parent.kind == self.model.KIND.international:
+                representing_raw = legacy_code
+            elif parent.kind == self.model.KIND.district:
+                representing_raw = parent.code
+            elif parent.kind == self.model.KIND.chapter:
+                representing_raw = parent.parent.code
+            else:
+                representing_raw = None
+        elif kind == 'organization':
+            representing_raw = 'BHS'
+        else:
+            representing_raw = None
+
+        representing_map = {
+            'BHS': self.model.DISTRICT.bhs,
+            'CAR': self.model.DISTRICT.car,
+            'CSD': self.model.DISTRICT.csd,
+            'DIX': self.model.DISTRICT.dix,
+            'EVG': self.model.DISTRICT.evg,
+            'FWD': self.model.DISTRICT.fwd,
+            'ILL': self.model.DISTRICT.ill,
+            'JAD': self.model.DISTRICT.jad,
+            'LOL': self.model.DISTRICT.lol,
+            'MAD': self.model.DISTRICT.mad,
+            'NED': self.model.DISTRICT.ned,
+            'NSC': self.model.DISTRICT.nsc,
+            'ONT': self.model.DISTRICT.ont,
+            'PIO': self.model.DISTRICT.pio,
+            'RMD': self.model.DISTRICT.rmd,
+            'SLD': self.model.DISTRICT.sld,
+            'SUN': self.model.DISTRICT.sun,
+            'SWD': self.model.DISTRICT.swd,
+        }
+        district = representing_map.get(representing_raw, None)
+
         division_map = {
             'EVG Division I': self.model.DIVISION.evgd1,
             'EVG Division II': self.model.DIVISION.evgd2,
@@ -238,50 +260,21 @@ class GroupManager(Manager):
         }
         division = division_map.get(division, None)
 
+        website = validate_url(website)
+        facebook = validate_url(facebook)
+        twitter = validate_url(twitter)
+        youtube = validate_url(youtube)
+        pinterest = validate_url(pinterest)
+        flickr = validate_url(flickr)
+        instagram = validate_url(instagram)
+        soundcloud = validate_url(soundcloud)
+
+        phone = validate_phone(main_phone)
+        fax_phone = validate_phone(fax_phone)
+
+        email = validate_email(email)
+
         visitor_information = visitor_information.strip() if visitor_information else ''
-
-        if parent_pk:
-            parent = self.get(
-                id=parent_pk,
-            )
-        else:
-            parent = None
-
-        if parent:
-            if parent.kind == 'organization':
-                representing_raw = legacy_code
-            elif parent.kind == 'district':
-                representing_raw = parent.legacy_code
-            elif parent.kind == 'chapter':
-                representing_raw = parent.parent.legacy_code
-            else:
-                representing_raw = None
-        elif kind == 'organization':
-            representing_raw = 'BHS'
-        else:
-            representing_raw = None
-
-        representing_map = {
-            'BHS': self.model.REPRESENTING.bhs,
-            'CAR': self.model.REPRESENTING.car,
-            'CSD': self.model.REPRESENTING.csd,
-            'DIX': self.model.REPRESENTING.dix,
-            'EVG': self.model.REPRESENTING.evg,
-            'FWD': self.model.REPRESENTING.fwd,
-            'ILL': self.model.REPRESENTING.ill,
-            'JAD': self.model.REPRESENTING.jad,
-            'LOL': self.model.REPRESENTING.lol,
-            'MAD': self.model.REPRESENTING.mad,
-            'NED': self.model.REPRESENTING.ned,
-            'NSC': self.model.REPRESENTING.nsc,
-            'ONT': self.model.REPRESENTING.ont,
-            'PIO': self.model.REPRESENTING.pio,
-            'RMD': self.model.REPRESENTING.rmd,
-            'SLD': self.model.REPRESENTING.sld,
-            'SUN': self.model.REPRESENTING.sun,
-            'SWD': self.model.REPRESENTING.swd,
-        }
-        district = representing_map.get(representing_raw, None)
 
         defaults = {
             'status': status,
@@ -294,7 +287,7 @@ class GroupManager(Manager):
             'code': legacy_code,
             'website': website,
             'email': email,
-            'phone': main_phone,
+            'phone': phone,
             'fax_phone': fax_phone,
             'facebook': facebook,
             'twitter': twitter,
@@ -307,11 +300,6 @@ class GroupManager(Manager):
             'start_date': established_date,
             'parent': parent,
         }
-
-        try:
-            validate_url(website)
-        except ValidationError:
-            website = ''
 
         # Load
         group, created = self.update_or_create(
@@ -563,12 +551,7 @@ class PersonManager(Manager):
         else:
             part = None
 
-        try:
-            validate_email(email)
-        except ValidationError:
-            email = ''
-        if email:
-            email = email.lower()
+        email = validate_email(email)
 
         if not first_name:
             first_name = ""
