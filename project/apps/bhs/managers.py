@@ -25,8 +25,10 @@ class GroupManager(Manager):
             raise ValueError("Must be dict")
         mc_pk = structure['id']
         name = structure['name']
+        status = structure['status_real']
         kind = structure['kind']
         gender = structure['gender']
+        district = structure['district']
         division = structure['division']
         bhs_id = structure['bhs_id']
         legacy_code = structure['chapter_code']
@@ -44,25 +46,6 @@ class GroupManager(Manager):
         preferred_name = structure['preferred_name']
         visitor_information = structure['visitor_information']
         established_date = structure['established_date']
-        status_id = structure['status_id']
-        parent_pk = structure['parent_id']
-
-
-        # Transform
-        status_map = {
-            '64ad817f-f3c6-4b09-a1b0-4bd569b15d03': self.model.STATUS.inactive, # revoked
-            'd9e3e257-9eca-4cbf-959f-149cca968349': self.model.STATUS.inactive, # suspended
-            '6e3c5cc6-0734-4edf-8f51-40d3a865a94f': self.model.STATUS.inactive, # merged
-            'bd4721e7-addd-4854-9888-8a705725f748': self.model.STATUS.inactive, # closed
-            'e04744e6-b743-4247-92c2-2950855b3a93': self.model.STATUS.inactive, # expired
-            '55a97973-02c3-414a-bbef-22181ad46e85': self.model.STATUS.active, # pending
-            'bb1ee6f6-a2c5-4615-b6ad-76130c37b1e6': self.model.STATUS.active, # pending voluntary
-            'd7102af8-013a-40e7-bc85-0b00766ed124': self.model.STATUS.active, # awaiting
-            'f3facc00-1990-4c68-9052-39e066906a38': self.model.STATUS.active, # prospective
-            '4bfee76f-3110-4c32-bade-e5044fdd5fa2': self.model.STATUS.active, # licensed
-            '7b9e5e34-a7c5-4f1e-9fc5-656caa74b3c7': self.model.STATUS.active, # active
-        }
-        status = status_map.get(status_id, None)
 
         # Re-construct dangling article
         name = name.strip() if name else ""
@@ -186,28 +169,7 @@ class GroupManager(Manager):
         }
         gender = gender_map.get(gender, self.model.GENDER.male)
 
-        if parent_pk:
-            parent = self.get(
-                id=parent_pk,
-            )
-        else:
-            parent = None
-
-        if parent:
-            if parent.kind == self.model.KIND.international:
-                representing_raw = legacy_code
-            elif parent.kind == self.model.KIND.district:
-                representing_raw = parent.code
-            elif parent.kind == self.model.KIND.chapter:
-                representing_raw = parent.parent.code
-            else:
-                representing_raw = None
-        elif kind == 'organization':
-            representing_raw = 'BHS'
-        else:
-            representing_raw = None
-
-        representing_map = {
+        district_map = {
             'BHS': self.model.DISTRICT.bhs,
             'CAR': self.model.DISTRICT.car,
             'CSD': self.model.DISTRICT.csd,
@@ -227,7 +189,7 @@ class GroupManager(Manager):
             'SUN': self.model.DISTRICT.sun,
             'SWD': self.model.DISTRICT.swd,
         }
-        district = representing_map.get(representing_raw, None)
+        district = district_map.get(district, None)
 
         division_map = {
             'EVG Division I': self.model.DIVISION.evgd1,
@@ -298,7 +260,7 @@ class GroupManager(Manager):
             'soundcloud': soundcloud,
             'visitor_information': visitor_information,
             'start_date': established_date,
-            'parent': parent,
+            # 'parent': parent,
         }
 
         # Load
@@ -534,6 +496,19 @@ class PersonManager(Manager):
             id=mc_pk,
             defaults=defaults,
         )
+        # Update owners conditionally
+        if person.email and person.status == person.STATUS.active:
+            defaults = {
+                'name': person.name,
+                'first_name': person.first_name,
+                'last_name': person.last_name,
+            }
+            user, made = User.objects.update_or_create(
+                email=person.email,
+                defaults=defaults,
+            )
+            if made:
+                person.owners.add(user)
         return person, created
 
     def delete_orphans(self, humans):
@@ -672,25 +647,25 @@ class MemberManager(Manager):
             defaults=defaults,
         )
         # Update Person/User conditionally
-        check = all([
-            member.group.bhs_id == 1, # Only check BHS membership
-            person.email, # With an email
-            status > 0, # And currently active status
-        ])
-        if check:
-            person.current_through = member.end_date
-            person.status = member.status
-            person.save()
-            defaults = {
-                'name': person.name,
-                'first_name': person.first_name,
-                'last_name': person.last_name,
-            }
-            user, _ = User.objects.update_or_create(
-                email=person.email,
-                defaults=defaults,
-            )
-            person.owners.add(user)
+        # check = all([
+        #     member.group.bhs_id == 1, # Only check BHS membership
+        #     person.email, # With an email
+        #     status > 0, # And currently active status
+        # ])
+        # if check:
+        #     person.current_through = member.end_date
+        #     person.status = member.status
+        #     person.save()
+        #     defaults = {
+        #         'name': person.name,
+        #         'first_name': person.first_name,
+        #         'last_name': person.last_name,
+        #     }
+        #     user, _ = User.objects.update_or_create(
+        #         email=person.email,
+        #         defaults=defaults,
+        #     )
+        #     person.owners.add(user)
         return member, created
 
 

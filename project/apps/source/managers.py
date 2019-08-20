@@ -73,52 +73,69 @@ class HumanManager(Manager):
 
 class StructureManager(Manager):
     def export_values(self, cursor=None):
-        output = []
-        types = [
-            'organization',
-            'district',
-            'group',
-            'chapter',
-            'chorus',
-            'quartet',
+        active_status = [
+            'active',
+            'active-internal',
         ]
-        for t in types:
-            ss = self.filter(
-                Q(kind=t),
-                Q(deleted_by_id="") | Q(deleted_by_id=None),
+        ss = self.filter(
+            Q(deleted_by_id="") | Q(deleted_by_id=None),
+        )
+        if cursor:
+            ss = ss.filter(
+                modified__gte=cursor,
             )
-            if cursor:
-                ss = ss.filter(
-                    modified__gte=cursor,
-                )
-            output.extend(
-                list(ss.values(
-                    'id',
-                    'name',
-                    'kind',
-                    'gender',
-                    'division',
-                    'bhs_id',
-                    'chapter_code',
-                    'website',
-                    'email',
-                    'phone',
-                    'fax',
-                    'facebook',
-                    'twitter',
-                    'youtube',
-                    'pinterest',
-                    'flickr',
-                    'instagram',
-                    'soundcloud',
-                    'preferred_name',
-                    'visitor_information',
-                    'established_date',
-                    'status_id',
-                    'parent_id',
-                ))
+        ss = ss.annotate(
+            status_real=Case(
+                When(
+                    status__name__in=active_status,
+                    then=10,
+                ),
+                default=-10,
+                output_field=IntegerField(),
+            ),
+            district=Case(
+                When(
+                    parent__kind='organization',
+                    then=F('chapter_code'),
+                ),
+                When(
+                    parent__kind='district',
+                    then=F('parent__chapter_code'),
+                ),
+                When(
+                    parent__kind='chapter',
+                    then=F('parent__parent__chapter_code'),
+                ),
+                default=None,
+                output_field=CharField(),
             )
-        return output
+        )
+
+        return list(ss.values(
+            'id',
+            'name',
+            'kind',
+            'gender',
+            'division',
+            'bhs_id',
+            'chapter_code',
+            'website',
+            'email',
+            'phone',
+            'fax',
+            'facebook',
+            'twitter',
+            'youtube',
+            'pinterest',
+            'flickr',
+            'instagram',
+            'soundcloud',
+            'preferred_name',
+            'visitor_information',
+            'established_date',
+            'district',
+            'status_real',
+        ))
 
 
 class RoleManager(Manager):
