@@ -16,204 +16,6 @@ from .validators import validate_url
 User = get_user_model()
 
 
-class PersonManager(Manager):
-    def update_or_create_from_human(self, human):
-        # Extract
-        if isinstance(human, dict):
-            mc_pk = human['id']
-            first_name = human['first_name']
-            middle_name = human['middle_name']
-            last_name = human['last_name']
-            nick_name = human['nick_name']
-            email = human['email']
-            birth_date = human['birth_date']
-            home_phone = human['home_phone']
-            cell_phone = human['cell_phone']
-            work_phone = human['work_phone']
-            bhs_id = human['bhs_id']
-            gender = human['gender']
-            part = human['part']
-            mon = human['mon']
-            is_deceased = human['is_deceased']
-            is_honorary = human['is_honorary']
-            is_suspended = human['is_suspended']
-            is_expelled = human['is_expelled']
-        else:
-            mc_pk = str(human.id)
-            first_name = human.first_name
-            middle_name = human.middle_name
-            last_name = human.last_name
-            nick_name = human.nick_name
-            email = human.email
-            birth_date = human.birth_date
-            home_phone = human.home_phone
-            cell_phone = human.cell_phone
-            work_phone = human.work_phone
-            bhs_id = human.bhs_id
-            gender = human.gender
-            part = human.part
-            mon = human.mon
-            is_deceased = human.is_deceased
-            is_honorary = human.is_honorary
-            is_suspended = human.is_suspended
-            is_expelled = human.is_expelled
-
-        # Transform
-        # inactive = any([
-        #     is_deceased,
-        #     is_honorary,
-        #     is_suspended,
-        #     is_expelled,
-        # ])
-        # if inactive:
-        #     status = self.model.STATUS.inactive
-        # else:
-        #     status = self.model.STATUS.active
-
-        prefix = first_name.rpartition('Dr.')[1].strip()
-        first_name = first_name.rpartition('Dr.')[2].strip()
-        last_name = last_name.partition('II')[0].strip()
-        suffix = last_name.partition('II')[1].strip()
-        last_name = last_name.partition('III')[0].strip()
-        suffix = last_name.partition('III')[1].strip()
-        last_name = last_name.partition('DDS')[0].strip()
-        suffix = last_name.partition('DDS')[1].strip()
-        # last_name = last_name.partition('Sr')[0].strip()
-        # suffix = last_name.partition('Sr')[1].strip()
-        # last_name = last_name.partition('Jr')[0].strip()
-        # suffix = last_name.partition('Jr')[1].strip()
-        last_name = last_name.partition('M.D.')[0].strip()
-        suffix = last_name.partition('M.D.')[1].strip()
-        if nick_name == first_name:
-            nick_name = ""
-
-        if first_name:
-            first_name.translate(
-                first_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
-            ).strip()
-
-        if middle_name:
-            middle_name.translate(
-                middle_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
-            ).strip()
-
-        if last_name:
-            last_name.translate(
-                last_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
-            ).strip()
-
-        if nick_name:
-            nick_name.translate(
-                nick_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
-            ).strip()
-
-        try:
-            validate_international_phonenumber(home_phone)
-        except ValidationError:
-            home_phone = ""
-        if not home_phone:
-            home_phone = ""
-        try:
-            validate_international_phonenumber(cell_phone)
-        except ValidationError:
-            cell_phone = ""
-        if not cell_phone:
-            cell_phone = ""
-        try:
-            validate_international_phonenumber(work_phone)
-        except ValidationError:
-            work_phone = ""
-        if not work_phone:
-            work_phone = ""
-
-        if gender:
-            gender = getattr(self.model.GENDER, gender, None)
-        else:
-            gender = None
-        if part:
-            part = getattr(self.model.PART, part, None)
-        else:
-            part = None
-
-        try:
-            validate_email(email)
-        except ValidationError:
-            email = ''
-        if email:
-            email = email.lower()
-
-        if not first_name:
-            first_name = ""
-        if not middle_name:
-            middle_name = ""
-        if not last_name:
-            last_name = ""
-        if not nick_name:
-            nick_name = ""
-
-        is_deceased = bool(is_deceased)
-
-
-        defaults = {
-            # 'status': status,
-            'prefix': prefix,
-            'first_name': first_name,
-            'middle_name': middle_name,
-            'last_name': last_name,
-            'suffix': suffix,
-            'nick_name': nick_name,
-            'email': email,
-            'birth_date': birth_date,
-            'home_phone': home_phone,
-            'cell_phone': cell_phone,
-            'work_phone': work_phone,
-            'bhs_id': bhs_id,
-            'gender': gender,
-            'part': part,
-            'is_deceased': is_deceased,
-            'mon': mon,
-        }
-        # Update or create
-        person, created = self.update_or_create(
-            id=mc_pk,
-            defaults=defaults,
-        )
-        return person, created
-
-    def delete_orphans(self, humans):
-        # Delete Orphans
-        orphans = self.filter(
-            id__isnull=False,
-        ).exclude(
-            id__in=humans,
-        )
-        t = orphans.count()
-        orphans.delete()
-        return t
-
-    def export_orphans(self, cursor=None):
-        ps = self.filter(
-            email__isnull=True,
-            user__isnull=False,
-        )
-        if cursor:
-            ps = ps.filter(
-                modified__gte=cursor,
-            )
-        return ps
-
-    def export_adoptions(self, cursor=None):
-        ps = self.filter(
-            email__isnull=False,
-            user__isnull=True,
-        )
-        if cursor:
-            ps = ps.filter(
-                modified__gte=cursor,
-            )
-        return ps
-
-
 class GroupManager(Manager):
     def update_or_create_from_structure(self, structure):
         # Extract
@@ -640,6 +442,204 @@ class GroupManager(Manager):
         file = save_virtual_workbook(wb)
         content = ContentFile(file)
         return content
+
+
+class PersonManager(Manager):
+    def update_or_create_from_human(self, human):
+        # Extract
+        if isinstance(human, dict):
+            mc_pk = human['id']
+            first_name = human['first_name']
+            middle_name = human['middle_name']
+            last_name = human['last_name']
+            nick_name = human['nick_name']
+            email = human['email']
+            birth_date = human['birth_date']
+            home_phone = human['home_phone']
+            cell_phone = human['cell_phone']
+            work_phone = human['work_phone']
+            bhs_id = human['bhs_id']
+            gender = human['gender']
+            part = human['part']
+            mon = human['mon']
+            is_deceased = human['is_deceased']
+            is_honorary = human['is_honorary']
+            is_suspended = human['is_suspended']
+            is_expelled = human['is_expelled']
+        else:
+            mc_pk = str(human.id)
+            first_name = human.first_name
+            middle_name = human.middle_name
+            last_name = human.last_name
+            nick_name = human.nick_name
+            email = human.email
+            birth_date = human.birth_date
+            home_phone = human.home_phone
+            cell_phone = human.cell_phone
+            work_phone = human.work_phone
+            bhs_id = human.bhs_id
+            gender = human.gender
+            part = human.part
+            mon = human.mon
+            is_deceased = human.is_deceased
+            is_honorary = human.is_honorary
+            is_suspended = human.is_suspended
+            is_expelled = human.is_expelled
+
+        # Transform
+        # inactive = any([
+        #     is_deceased,
+        #     is_honorary,
+        #     is_suspended,
+        #     is_expelled,
+        # ])
+        # if inactive:
+        #     status = self.model.STATUS.inactive
+        # else:
+        #     status = self.model.STATUS.active
+
+        prefix = first_name.rpartition('Dr.')[1].strip()
+        first_name = first_name.rpartition('Dr.')[2].strip()
+        last_name = last_name.partition('II')[0].strip()
+        suffix = last_name.partition('II')[1].strip()
+        last_name = last_name.partition('III')[0].strip()
+        suffix = last_name.partition('III')[1].strip()
+        last_name = last_name.partition('DDS')[0].strip()
+        suffix = last_name.partition('DDS')[1].strip()
+        # last_name = last_name.partition('Sr')[0].strip()
+        # suffix = last_name.partition('Sr')[1].strip()
+        # last_name = last_name.partition('Jr')[0].strip()
+        # suffix = last_name.partition('Jr')[1].strip()
+        last_name = last_name.partition('M.D.')[0].strip()
+        suffix = last_name.partition('M.D.')[1].strip()
+        if nick_name == first_name:
+            nick_name = ""
+
+        if first_name:
+            first_name.translate(
+                first_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
+            ).strip()
+
+        if middle_name:
+            middle_name.translate(
+                middle_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
+            ).strip()
+
+        if last_name:
+            last_name.translate(
+                last_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
+            ).strip()
+
+        if nick_name:
+            nick_name.translate(
+                nick_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
+            ).strip()
+
+        try:
+            validate_international_phonenumber(home_phone)
+        except ValidationError:
+            home_phone = ""
+        if not home_phone:
+            home_phone = ""
+        try:
+            validate_international_phonenumber(cell_phone)
+        except ValidationError:
+            cell_phone = ""
+        if not cell_phone:
+            cell_phone = ""
+        try:
+            validate_international_phonenumber(work_phone)
+        except ValidationError:
+            work_phone = ""
+        if not work_phone:
+            work_phone = ""
+
+        if gender:
+            gender = getattr(self.model.GENDER, gender, None)
+        else:
+            gender = None
+        if part:
+            part = getattr(self.model.PART, part, None)
+        else:
+            part = None
+
+        try:
+            validate_email(email)
+        except ValidationError:
+            email = ''
+        if email:
+            email = email.lower()
+
+        if not first_name:
+            first_name = ""
+        if not middle_name:
+            middle_name = ""
+        if not last_name:
+            last_name = ""
+        if not nick_name:
+            nick_name = ""
+
+        is_deceased = bool(is_deceased)
+
+
+        defaults = {
+            # 'status': status,
+            'prefix': prefix,
+            'first_name': first_name,
+            'middle_name': middle_name,
+            'last_name': last_name,
+            'suffix': suffix,
+            'nick_name': nick_name,
+            'email': email,
+            'birth_date': birth_date,
+            'home_phone': home_phone,
+            'cell_phone': cell_phone,
+            'work_phone': work_phone,
+            'bhs_id': bhs_id,
+            'gender': gender,
+            'part': part,
+            'is_deceased': is_deceased,
+            'mon': mon,
+        }
+        # Update or create
+        person, created = self.update_or_create(
+            id=mc_pk,
+            defaults=defaults,
+        )
+        return person, created
+
+    def delete_orphans(self, humans):
+        # Delete Orphans
+        orphans = self.filter(
+            id__isnull=False,
+        ).exclude(
+            id__in=humans,
+        )
+        t = orphans.count()
+        orphans.delete()
+        return t
+
+    def export_orphans(self, cursor=None):
+        ps = self.filter(
+            email__isnull=True,
+            user__isnull=False,
+        )
+        if cursor:
+            ps = ps.filter(
+                modified__gte=cursor,
+            )
+        return ps
+
+    def export_adoptions(self, cursor=None):
+        ps = self.filter(
+            email__isnull=False,
+            user__isnull=True,
+        )
+        if cursor:
+            ps = ps.filter(
+                modified__gte=cursor,
+            )
+        return ps
 
 
 class OfficerManager(Manager):
