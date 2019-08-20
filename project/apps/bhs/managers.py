@@ -435,73 +435,45 @@ class GroupManager(Manager):
 class PersonManager(Manager):
     def update_or_create_from_human(self, human):
         # Extract
-        if isinstance(human, dict):
-            mc_pk = human['id']
-            first_name = human['first_name']
-            middle_name = human['middle_name']
-            last_name = human['last_name']
-            nick_name = human['nick_name']
-            email = human['email']
-            birth_date = human['birth_date']
-            home_phone = human['home_phone']
-            cell_phone = human['cell_phone']
-            work_phone = human['work_phone']
-            bhs_id = human['bhs_id']
-            gender = human['gender']
-            part = human['part']
-            mon = human['mon']
-            is_deceased = human['is_deceased']
-            is_honorary = human['is_honorary']
-            is_suspended = human['is_suspended']
-            is_expelled = human['is_expelled']
-        else:
-            mc_pk = str(human.id)
-            first_name = human.first_name
-            middle_name = human.middle_name
-            last_name = human.last_name
-            nick_name = human.nick_name
-            email = human.email
-            birth_date = human.birth_date
-            home_phone = human.home_phone
-            cell_phone = human.cell_phone
-            work_phone = human.work_phone
-            bhs_id = human.bhs_id
-            gender = human.gender
-            part = human.part
-            mon = human.mon
-            is_deceased = human.is_deceased
-            is_honorary = human.is_honorary
-            is_suspended = human.is_suspended
-            is_expelled = human.is_expelled
+        if not isinstance(human, dict):
+            return ValueError("Must be dictionary")
 
-        # Transform
-        # inactive = any([
-        #     is_deceased,
-        #     is_honorary,
-        #     is_suspended,
-        #     is_expelled,
-        # ])
-        # if inactive:
-        #     status = self.model.STATUS.inactive
-        # else:
-        #     status = self.model.STATUS.active
+        mc_pk = human['id']
+        first_name = human['first_name']
+        middle_name = human['middle_name']
+        last_name = human['last_name']
+        nick_name = human['nick_name']
+        email = human['email']
+        birth_date = human['birth_date']
+        home_phone = human['home_phone']
+        cell_phone = human['cell_phone']
+        work_phone = human['work_phone']
+        bhs_id = human['bhs_id']
+        gender = human['gender']
+        part = human['part']
+        mon = human['mon']
+        is_deceased = human['is_deceased']
+        # is_honorary = human['is_honorary']
+        # is_suspended = human['is_suspended']
+        # is_expelled = human['is_expelled']
+        status = human['status']
+        current_through = human['current_through']
 
-        prefix = first_name.rpartition('Dr.')[1].strip()
-        first_name = first_name.rpartition('Dr.')[2].strip()
-        last_name = last_name.partition('II')[0].strip()
-        suffix = last_name.partition('II')[1].strip()
-        last_name = last_name.partition('III')[0].strip()
-        suffix = last_name.partition('III')[1].strip()
-        last_name = last_name.partition('DDS')[0].strip()
-        suffix = last_name.partition('DDS')[1].strip()
-        # last_name = last_name.partition('Sr')[0].strip()
-        # suffix = last_name.partition('Sr')[1].strip()
-        # last_name = last_name.partition('Jr')[0].strip()
-        # suffix = last_name.partition('Jr')[1].strip()
-        last_name = last_name.partition('M.D.')[0].strip()
-        suffix = last_name.partition('M.D.')[1].strip()
+        _, prefix, first_name = first_name.rpartition('Dr.')
+        last_name, suffix, _ = last_name.partition('II')
+        last_name, suffix, _ = last_name.partition('II')
+        last_name, suffix, _ = last_name.partition('DDS')
+        last_name, suffix, _ = last_name.partition('M.D.')
+        if last_name.endswith('Sr'):
+            last_name, suffix, _ = last_name.partition('Sr')
+        if last_name.endswith('Jr'):
+            last_name, suffix, _ = last_name.partition('Jr')
+
         if nick_name == first_name:
             nick_name = ""
+
+        if prefix:
+            prefix = prefix.strip()
 
         if first_name:
             first_name.translate(
@@ -523,50 +495,22 @@ class PersonManager(Manager):
                 nick_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
             ).strip()
 
-        try:
-            validate_international_phonenumber(home_phone)
-        except ValidationError:
-            home_phone = ""
-        if not home_phone:
-            home_phone = ""
-        try:
-            validate_international_phonenumber(cell_phone)
-        except ValidationError:
-            cell_phone = ""
-        if not cell_phone:
-            cell_phone = ""
-        try:
-            validate_international_phonenumber(work_phone)
-        except ValidationError:
-            work_phone = ""
-        if not work_phone:
-            work_phone = ""
+        if suffix:
+            suffix = suffix.strip()
 
-        if gender:
-            gender = getattr(self.model.GENDER, gender, None)
-        else:
-            gender = None
-        if part:
-            part = getattr(self.model.PART, part, None)
-        else:
-            part = None
+        home_phone = validate_phone(home_phone)
+        cell_phone = validate_phone(cell_phone)
+        work_phone = validate_phone(work_phone)
 
         email = validate_email(email)
 
-        if not first_name:
-            first_name = ""
-        if not middle_name:
-            middle_name = ""
-        if not last_name:
-            last_name = ""
-        if not nick_name:
-            nick_name = ""
+        gender = getattr(self.model.GENDER, gender, None) if gender else None
+        part = getattr(self.model.PART, part, None) if part else None
 
         is_deceased = bool(is_deceased)
 
-
         defaults = {
-            # 'status': status,
+            'status': status,
             'prefix': prefix,
             'first_name': first_name,
             'middle_name': middle_name,
@@ -583,6 +527,7 @@ class PersonManager(Manager):
             'part': part,
             'is_deceased': is_deceased,
             'mon': mon,
+            'current_through': current_through,
         }
         # Update or create
         person, created = self.update_or_create(

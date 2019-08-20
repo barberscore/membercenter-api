@@ -1,8 +1,8 @@
+
 # Standard Library
 from datetime import date
 
 # Django
-from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.db.models import Case
 from django.db.models import CharField
@@ -17,19 +17,36 @@ from django.db.models import Q
 from django.db.models import Subquery
 from django.db.models import When
 
-User = get_user_model()
 
+User = get_user_model()
 
 class HumanManager(Manager):
     def export_values(self, cursor=None):
+        today = date.today()
         hs = self.filter(
             Q(merged_id="") | Q(merged_id=None),
             Q(deleted_by_id="") | Q(deleted_by_id=None),
         )
         if cursor:
             hs = hs.filter(
-                modified__gte=cursor,
+                Q(modified__gte=cursor) | Q(subscriptions__modified__gte=cursor),
             )
+        hs = hs.annotate(
+            current_through=Max(
+                'subscriptions__current_through',
+                filter=Q(
+                    subscriptions__items_editable=True,
+                    subscriptions__deleted__isnull=True,
+                    subscriptions__current_through__gt='0001-01-01',
+                ),
+            ),
+            status=Case(
+                When(current_through__gte=today, then=10),
+                default=-10,
+                output_field=IntegerField(),
+            ),
+        )
+
         return list(hs.values(
             'id',
             'first_name',
@@ -49,6 +66,8 @@ class HumanManager(Manager):
             'is_honorary',
             'is_suspended',
             'is_expelled',
+            'status',
+            'current_through',
         ))
 
 

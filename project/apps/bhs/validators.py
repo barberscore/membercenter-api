@@ -57,7 +57,7 @@ def validate_phone(value):
         validate_international_phonenumber(value)
     except ValidationError:
         return ""
-    return value
+    return value if value else ""
 
 
 def validate_email(value):
