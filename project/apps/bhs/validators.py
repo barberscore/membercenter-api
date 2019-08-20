@@ -13,12 +13,14 @@ def validate_bhs_id(value):
         raise ValidationError(
             "Must be between 0 and 999999"
         )
+    return value
 
 def validate_birth_date(value):
     if not date(1900, 1, 1) < value < date(2015, 1, 1):  # Your conditions here
         raise ValidationError(
             "The birthdate must be reasonable."
         )
+    return value
 
 validate_tin = RegexValidator(
     r'(9\d{2})([ \-]?)([7]\d|8[0-8])([ \-]?)(\d{4})',
