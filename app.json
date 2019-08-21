@@ -115,7 +115,8 @@
         "AUTH0_CLIENT_ID": "test",
         "AUTH0_CLIENT_SECRET": "test",
         "AUTH0_DOMAIN": "login.barberscore.com",
-        "AUTH0_CONNECTION": "Default"
+        "AUTH0_CONNECTION": "Default",
+        "BHS_DATABASE_URL": "test"
       },
       "stack": "heroku-18",
       "scripts": {
