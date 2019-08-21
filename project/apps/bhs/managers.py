@@ -437,25 +437,27 @@ class PersonManager(Manager):
         if prefix:
             prefix = prefix.strip()
 
-        if first_name:
-            first_name.translate(
-                first_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
-            ).strip()
+        first_name.translate(
+            first_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
+        ).strip()
+
+        last_name.translate(
+            last_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
+        ).strip()
 
         if middle_name:
             middle_name.translate(
                 middle_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
             ).strip()
-
-        if last_name:
-            last_name.translate(
-                last_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
-            ).strip()
+        else:
+            middle_name = ""
 
         if nick_name:
             nick_name.translate(
                 nick_name.maketrans('', '', '!"#$%&()*+,./:;<=>?@[\\]^_`{|}~')
             ).strip()
+        else:
+            nick_name = ""
 
         if suffix:
             suffix = suffix.strip()
