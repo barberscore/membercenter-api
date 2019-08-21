@@ -3,17 +3,15 @@
 from dry_rest_permissions.generics import DRYPermissionsField
 from rest_framework.serializers import SerializerMethodField
 from rest_framework.validators import UniqueTogetherValidator
-# from rest_framework_json_api import serializers
-from rest_framework import serializers
+from rest_framework_json_api import serializers
 from rest_framework_json_api.relations import ResourceRelatedField
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.core.validators import validate_email
-
 from phonenumber_field.validators import validate_international_phonenumber
+
 # Local
-from .fields import TimezoneField
 from .models import Group
 from .models import Member
 from .models import Officer
@@ -23,7 +21,7 @@ User = get_user_model()
 validate_url = URLValidator()
 
 class GroupSerializer(serializers.ModelSerializer):
-    # permissions = DRYPermissionsField()
+    permissions = DRYPermissionsField()
     included_serializers = {
         # 'repertories': 'apps.bhs.serializers.RepertorySerializer',
         # 'members': 'apps.bhs.serializers.MemberSerializer',
