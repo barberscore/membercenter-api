@@ -3,13 +3,10 @@
 import pytest
 from rest_framework.test import APIClient
 
-# Django
+# # Django
 from django.test.client import Client
 
-# Local
-from .factories import AwardFactory
-from .factories import ChartFactory
-from .factories import ConventionFactory
+# # Local
 from .factories import GroupFactory
 from .factories import PersonFactory
 from .factories import UserFactory
@@ -37,10 +34,8 @@ def admin_api_client():
 
 @pytest.fixture
 def user_api_client():
-    # person = PersonFactory()
     user = UserFactory(
         is_staff=False,
-        # person=person,
     )
     client = APIClient()
     client.force_authenticate(user=user)
@@ -54,24 +49,8 @@ def anon_api_client():
 
 
 @pytest.fixture
-def award():
-    return AwardFactory()
-
-
-@pytest.fixture
-def chart():
-    return ChartFactory()
-
-
-@pytest.fixture
-def convention():
-    return ConventionFactory()
-
-
-@pytest.fixture
 def group():
     return GroupFactory()
-
 
 
 @pytest.fixture
