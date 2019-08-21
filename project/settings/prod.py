@@ -23,6 +23,22 @@ sentry_sdk.init(
     environment=get_env_variable("HEROKU_APP_NAME"),
 )
 
+# Databases
+DATABASES = {
+    'default': dj_database_url.parse(
+        get_env_variable("DATABASE_URL"),
+        conn_max_age=600,
+    ),
+    'source_db': dj_database_url.parse(
+        get_env_variable("BHS_DATABASE_URL"),
+        conn_max_age=600,
+    ),
+}
+
+DATABASE_ROUTERS = [
+    'routers.SourceRouter',
+]
+
 # Search
 # ALGOLIA['AUTO_INDEXING'] = True
 

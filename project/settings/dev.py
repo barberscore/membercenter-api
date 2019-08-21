@@ -26,6 +26,23 @@ DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.redirects.RedirectsPanel',
 ]
 
+# Databases
+DATABASES = {
+    'default': dj_database_url.parse(
+        get_env_variable("DATABASE_URL"),
+        conn_max_age=600,
+    ),
+    'source_db': dj_database_url.parse(
+        get_env_variable("BHS_DATABASE_URL"),
+        conn_max_age=600,
+    ),
+}
+
+DATABASE_ROUTERS = [
+    'routers.SourceRouter',
+]
+
+
 # Async settings
 RQ_QUEUES['default']['ASYNC'] = True
 RQ_QUEUES['high']['ASYNC'] = True
