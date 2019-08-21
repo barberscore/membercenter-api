@@ -28,36 +28,56 @@
     "postdeploy": "django-admin migrate"
   },
   "env": {
-    "MEMBERCENTER_CLIENT_ID": {
+    "ALGOLIASEARCH_API_KEY": {
+      "description": "Algolia API key.",
+      "required": true
+    },
+    "ALGOLIASEARCH_APPLICATION_ID": {
+      "description": "Algolia Application ID key.",
+      "required": true
+    },
+    "AUTH0_CLIENT_ID": {
       "description": "Auth0 Client id.",
       "required": true
     },
-    "MEMBERCENTER_CLIENT_SECRET": {
-      "description": "Auth0 Client secret.",
-      "required": true
-    },
-    "MEMBERCENTER_AUDIENCE": {
+    "AUTH0_CLIENT_SECRET": {
       "description": "Auth0 Client secret.",
       "required": true
     },
     "AUTH0_DOMAIN": {
-      "description": "Auth0 Authorization endpoint.",
+      "description": "Auth0 API issuer.",
       "required": true
     },
     "AUTH0_AUDIENCE": {
-      "description": "Auth0 Management endpoint.",
+      "description": "Auth0 API endpoint.",
       "required": true
     },
-    "BHS_DATABASE_URL": {
-      "description": "BHS source database.",
+    "AUTH0_CONNECTION": {
+      "description": "Auth0 Connection.",
       "required": true
     },
     "CLOUDINARY_URL": {
       "description": "Cloudinary service.",
       "required": true
     },
+    "MEMBERCENTER_URL": {
+      "description": "BHS Membercenter service.",
+      "required": true
+    },
     "SENTRY_DSN": {
       "description": "Sentry Bug Tracker.  Use production key.",
+      "required": true
+    },
+    "SENTRY_AUTH_TOKEN": {
+      "description": "Sentry Auth Token.",
+      "required": true
+    },
+    "SENTRY_ORG": {
+      "description": "Sentry Organization.",
+      "required": true
+    },
+    "SENTRY_PROJECT": {
+      "description": "Sentry Project.",
       "required": true
     },
     "DJANGO_SETTINGS_MODULE": {
@@ -83,16 +103,19 @@
         "heroku-redis:in-dyno"
       ],
       "env": {
-        "DJANGO_SETTINGS_MODULE": "settings.base",
+        "DJANGO_SETTINGS_MODULE": "settings.test",
         "PYTHONPATH": "project",
         "SECRET_KEY": {
           "generator": "secret"
         },
         "CLOUDINARY_URL": "test",
-        "MEMBERCENTER_CLIENT_ID": "test",
-        "MEMBERCENTER_CLIENT_SECRET": "test",
-        "AUTH0_DOMAIN": "test",
-        "AUTH0_CONNECTION": "Default"
+        "ALGOLIASEARCH_APPLICATION_ID": "test",
+        "ALGOLIASEARCH_API_KEY": "test",
+        "AUTH0_AUDIENCE": "test",
+        "AUTH0_CLIENT_ID": "test",
+        "AUTH0_CLIENT_SECRET": "test",
+        "AUTH0_DOMAIN": "login.barberscore.com",
+        "AUTH0_CONNECTION": "Default",
       },
       "stack": "heroku-18",
       "scripts": {
