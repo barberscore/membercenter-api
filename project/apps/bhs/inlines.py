@@ -54,6 +54,8 @@ class OfficerInline(admin.TabularInline):
         'person',
         'group',
         'status',
+        'created',
+        'modified',
     ]
     autocomplete_fields = [
         'person',
@@ -73,6 +75,8 @@ class OfficerInline(admin.TabularInline):
         'status',
         'office',
         'person',
+        'created',
+        'modified',
     ]
     can_delete = False
 
