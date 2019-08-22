@@ -316,6 +316,7 @@ class GroupSerializer(serializers.ModelSerializer):
             # 'repertories',
             'permissions',
             'usernames',
+            'useremails',
 
             'nomen',
             'image_id',
@@ -326,6 +327,7 @@ class GroupSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'nomen',
             'usernames',
+            'useremails',
             'image_id',
             'created',
             'modified',
@@ -447,6 +449,7 @@ class PersonSerializer(serializers.ModelSerializer):
 
             # 'owners',
             'usernames',
+            'useremails',
             'permissions',
             'created',
             'modified',
@@ -460,6 +463,7 @@ class PersonSerializer(serializers.ModelSerializer):
             'initials',
             'image_id',
             'usernames',
+            'useremails',
             # 'current_through',
             # 'current_status',
             # 'current_district',

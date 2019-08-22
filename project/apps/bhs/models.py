@@ -411,6 +411,10 @@ class Group(TimeStampedModel):
         return [x.username for x in self.owners.all()]
 
     @cached_property
+    def useremails(self):
+        return [x.email for x in self.owners.all()]
+
+    @cached_property
     def nomen(self):
         if self.bhs_id:
             suffix = "[{0}]".format(self.bhs_id)
@@ -1215,6 +1219,10 @@ class Person(TimeStampedModel):
     @cached_property
     def usernames(self):
         return [x.username for x in self.owners.all()]
+
+    @cached_property
+    def useremails(self):
+        return [x.email for x in self.owners.all()]
 
     @cached_property
     def nomen(self):
