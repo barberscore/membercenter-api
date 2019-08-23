@@ -11,7 +11,7 @@ from rest_framework.decorators import action
 from rest_framework.negotiation import BaseContentNegotiation
 from rest_framework.response import Response
 from rest_framework_json_api.django_filters import DjangoFilterBackend
-
+from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 # Django
 from django.utils.text import slugify
 
@@ -72,6 +72,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     filter_backends = [
         DjangoFilterBackend,
     ]
+    pagination_class = JsonApiPageNumberPagination
     permission_classes = [
         DRYPermissions,
     ]
@@ -256,6 +257,7 @@ class PersonViewSet(viewsets.ModelViewSet):
     filter_backends = [
         DjangoFilterBackend,
     ]
+    pagination_class = JsonApiPageNumberPagination
     permission_classes = [
         DRYPermissions,
     ]
