@@ -49,10 +49,10 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'django.contrib.auth.backends.RemoteUserBackend',
 ]
-USERNAME_FIELD = 'username'
+USERNAME_FIELD = 'email'
 REQUIRED_FIELDS = [
+    'id',
     'name',
-    'email',
 ]
 LOGIN_URL = 'admin:login'
 LOGIN_REDIRECT_URL = 'admin:index'

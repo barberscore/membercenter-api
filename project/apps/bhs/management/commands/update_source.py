@@ -83,13 +83,13 @@ class Command(BaseCommand):
             create_or_update_person_from_human.delay(human)
         self.stdout.write("")
         self.stdout.write("Updated {0} Persons.".format(t))
-        if not cursor:
-            humans = list(Human.objects.values_list('id', flat=True))
-            self.stdout.write("Deleting Person orphans...")
-            t = Person.objects.delete_orphans(humans)
-            self.stdout.write("Deleted {0} Person orphans.".format(t))
+        # # if not cursor:
+        # #     humans = list(Human.objects.values_list('id', flat=True))
+        # #     self.stdout.write("Deleting Person orphans...")
+        # #     t = Person.objects.delete_orphans(humans)
+        # #     self.stdout.write("Deleted {0} Person orphans.".format(t))
 
-        # Sync Groups
+        # # Sync Groups
         self.stdout.write("Fetching Structures from Source Database...")
         structures = Structure.objects.export_values(cursor=cursor)
         t = len(structures)
@@ -101,11 +101,11 @@ class Command(BaseCommand):
             create_or_update_group_from_structure.delay(structure)
         self.stdout.write("")
         self.stdout.write("Updated {0} Groups.".format(t))
-        if not cursor:
-            self.stdout.write("Deleting Orphans...")
-            structures = list(Structure.objects.values_list('id', flat=True))
-            t = Group.objects.delete_orphans(structures)
-            self.stdout.write("Deleted {0} Group orphans.".format(t))
+        # if not cursor:
+        #     self.stdout.write("Deleting Orphans...")
+        #     structures = list(Structure.objects.values_list('id', flat=True))
+        #     t = Group.objects.delete_orphans(structures)
+        #     self.stdout.write("Deleted {0} Group orphans.".format(t))
 
         # Sync Officers
         self.stdout.write("Fetching Roles from Source Database...")
@@ -119,9 +119,9 @@ class Command(BaseCommand):
             create_or_update_officer_from_role.delay(role)
         self.stdout.write("")
         self.stdout.write("Updated {0} Officers.".format(t))
-        if not cursor:
-            self.stdout.write("Deleting orphans...")
-            roles = list(Role.objects.values_list('id', flat=True))
-            t = Officer.objects.delete_orphans(roles)
-            self.stdout.write("Deleted {0} Officer orphans.".format(t))
+        # if not cursor:
+        #     self.stdout.write("Deleting orphans...")
+        #     roles = list(Role.objects.values_list('id', flat=True))
+        #     t = Officer.objects.delete_orphans(roles)
+        #     self.stdout.write("Deleted {0} Officer orphans.".format(t))
         self.stdout.write("Complete.")

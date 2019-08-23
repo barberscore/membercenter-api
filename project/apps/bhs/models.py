@@ -25,6 +25,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.db import models
 from django.utils.functional import cached_property
+from django.contrib.auth import get_user_model
 
 # Local
 from .fields import ImageUploadPath
@@ -406,13 +407,13 @@ class Group(TimeStampedModel):
     )
 
     # Properties
-    @cached_property
-    def usernames(self):
-        return [x.username for x in self.owners.all()]
+    # @cached_property
+    # def usernames(self):
+    #     return [x.username for x in self.owners.all()]
 
-    @cached_property
-    def useremails(self):
-        return [x.email for x in self.owners.all()]
+    # @cached_property
+    # def useremails(self):
+    #     return [x.email for x in self.owners.all()]
 
     @cached_property
     def nomen(self):
@@ -445,6 +446,21 @@ class Group(TimeStampedModel):
     #             officer.person.user,
     #         )
     #     return
+
+
+    def update_owners(self):
+        User = get_user_model()
+        emails = self.officers.filter(
+            person__email__isnull=False,
+        ).values_list(
+            'person__email',
+            flat=True,
+        )
+        owners = User.objects.filter(
+            email__in=emails,
+        )
+        return self.owners.set(owners)
+
 
     def get_roster(self):
         Member = apps.get_model('bhs.member')
@@ -1216,13 +1232,13 @@ class Person(TimeStampedModel):
             )
         )
 
-    @cached_property
-    def usernames(self):
-        return [x.username for x in self.owners.all()]
+    # @cached_property
+    # def usernames(self):
+    #     return [x.username for x in self.owners.all()]
 
-    @cached_property
-    def useremails(self):
-        return [x.email for x in self.owners.all()]
+    # @cached_property
+    # def useremails(self):
+    #     return [x.email for x in self.owners.all()]
 
     @cached_property
     def nomen(self):
@@ -1336,6 +1352,14 @@ class Person(TimeStampedModel):
 
     def __str__(self):
         return self.nomen
+
+    # Person Methods
+    def update_owners(self):
+        User = get_user_model()
+        owners = User.objects.filter(
+            email=self.email,
+        )
+        return self.owners.set(owners)
 
     # Permissions
     @staticmethod

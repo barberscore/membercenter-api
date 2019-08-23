@@ -498,19 +498,18 @@ class PersonManager(Manager):
             id=mc_pk,
             defaults=defaults,
         )
-        # Update owners conditionally
+        # Update and create user accounts conditionally:
         if person.email and person.status == person.STATUS.active:
             defaults = {
                 'name': person.name,
                 'first_name': person.first_name,
                 'last_name': person.last_name,
             }
-            user, made = User.objects.update_or_create(
+            User.objects.update_or_create(
                 email=person.email,
                 defaults=defaults,
             )
-            if made:
-                person.owners.add(user)
+        person.update_owners()
         return person, created
 
     def delete_orphans(self, humans):
@@ -581,18 +580,8 @@ class OfficerManager(Manager):
             office=office,
             defaults=defaults,
         )
-        # Only add owner if there is an email
-        if officer.person.email:
-            defaults = {
-                'name': officer.person.name,
-                'first_name': officer.person.first_name,
-                'last_name': officer.person.last_name,
-            }
-            user, _ = User.objects.update_or_create(
-                email=officer.person.email,
-                defaults=defaults,
-            )
-            officer.group.owners.add(user)
+        # Add owners
+        group.update_owners()
         return officer, created
 
 

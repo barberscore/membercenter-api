@@ -64,7 +64,9 @@ class PersonFactory(DjangoModelFactory):
 
 @mute_signals(pre_delete, pre_save, m2m_changed)
 class UserFactory(DjangoModelFactory):
-    username = Faker('uuid4')
+    id = Faker('uuid4')
+    name = Faker('name_male')
+    email = Faker('email')
     password = PostGenerationMethodCall('set_password', 'password')
     is_staff = False
 
