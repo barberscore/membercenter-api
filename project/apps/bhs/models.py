@@ -458,7 +458,7 @@ class Group(TimeStampedModel):
         )
         owners = User.objects.filter(
             email__in=emails,
-        )
+        ).distinct()
         return self.owners.set(owners)
 
 
