@@ -459,8 +459,9 @@ class Group(TimeStampedModel):
         owners = User.objects.filter(
             email__in=emails,
         ).distinct()
-        return self.owners.set(owners)
-
+        self.owners.set(owners)
+        # the self.save is only necessary to touch the modified field.
+        return self.save()
 
     def get_roster(self):
         Member = apps.get_model('bhs.member')
