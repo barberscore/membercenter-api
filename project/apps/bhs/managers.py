@@ -297,6 +297,8 @@ class GroupManager(Manager):
             child.save()
         orgs = self.filter(
             kind__in=[
+                self.model.KIND.district,
+                self.model.KIND.noncomp,
                 self.model.KIND.chapter,
                 self.model.KIND.chorus,
                 self.model.KIND.quartet,

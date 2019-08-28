@@ -21,7 +21,6 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import ArrayField
-from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.db import models
 from django.utils.functional import cached_property
@@ -29,7 +28,6 @@ from django.contrib.auth import get_user_model
 
 # Local
 from .fields import ImageUploadPath
-from .fields import LowerEmailField
 from .managers import MemberManager
 from .managers import GroupManager
 from .managers import OfficerManager
@@ -44,9 +42,6 @@ class Group(TimeStampedModel):
     )
 
     name = models.CharField(
-        help_text="""
-            The name of the resource.
-        """,
         max_length=255,
         default='UNKNOWN',
         editable=False,
@@ -60,7 +55,6 @@ class Group(TimeStampedModel):
     )
 
     status = FSMIntegerField(
-        help_text="""DO NOT CHANGE MANUALLY unless correcting a mistake.  Use the buttons to change state.""",
         choices=STATUS,
         default=STATUS.new,
         editable=False,
@@ -73,7 +67,6 @@ class Group(TimeStampedModel):
         ('District', [
             (11, 'district', "District"),
             (12, 'noncomp', "Noncompetitive"),
-            (13, 'affiliate', "Affiliate"),
         ]),
         ('Chapter', [
             (30, 'chapter', "Chapter"),
@@ -81,14 +74,10 @@ class Group(TimeStampedModel):
         ('Group', [
             (32, 'chorus', "Chorus"),
             (41, 'quartet', "Quartet"),
-            (46, 'vlq', "VLQ"),
         ]),
     )
 
     kind = models.IntegerField(
-        help_text="""
-            The kind of group.
-        """,
         choices=KIND,
         editable=False,
     )
@@ -100,11 +89,7 @@ class Group(TimeStampedModel):
     )
 
     gender = models.IntegerField(
-        help_text="""
-            The gender of group.
-        """,
         choices=GENDER,
-        default=GENDER.male,
         editable=False,
     )
 
@@ -196,7 +181,7 @@ class Group(TimeStampedModel):
 
     code = models.CharField(
         help_text="""
-            Short-form code.""",
+            Short-form chapter code.""",
         max_length=255,
         blank=True,
         default='',
@@ -211,7 +196,7 @@ class Group(TimeStampedModel):
         editable=False,
     )
 
-    email = LowerEmailField(
+    email = models.EmailField(
         help_text="""
             The contact email of the resource.""",
         null=True,
@@ -374,7 +359,7 @@ class Group(TimeStampedModel):
         editable=True,
     )
 
-    # Denormalization
+    # Group Denormalization
     tree_sort = models.IntegerField(
         unique=True,
         blank=True,
@@ -382,9 +367,12 @@ class Group(TimeStampedModel):
         editable=False,
     )
 
-    # FKs
+    # Group FKs
     owners = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
+        help_text="""
+            These are the active officers with active accounts.
+        """,
         related_name='groups',
         blank=True,
         editable=False,
@@ -400,21 +388,13 @@ class Group(TimeStampedModel):
         editable=False,
     )
 
-    # Relations
+    # Group Relations
     statelogs = GenericRelation(
         StateLog,
         related_query_name='groups',
     )
 
-    # Properties
-    # @cached_property
-    # def usernames(self):
-    #     return [x.username for x in self.owners.all()]
-
-    # @cached_property
-    # def useremails(self):
-    #     return [x.email for x in self.owners.all()]
-
+    # Group Properties
     @cached_property
     def nomen(self):
         if self.bhs_id:
@@ -436,18 +416,14 @@ class Group(TimeStampedModel):
     def image_id(self):
         return self.image.name or 'missing_image'
 
+    @cached_property
+    def image_url(self):
+        try:
+            return self.image.url
+        except ValueError:
+            return 'https://res.cloudinary.com/barberscore/image/upload/v1554830585/missing_image.jpg'
+
     # Group Methods
-    # def update_owners(self):
-    #     officers = self.officers.filter(
-    #         status__gt=0,
-    #     )
-    #     for officer in officers:
-    #         self.owners.add(
-    #             officer.person.user,
-    #         )
-    #     return
-
-
     def update_owners(self):
         User = get_user_model()
         emails = self.officers.filter(
@@ -529,44 +505,88 @@ class Group(TimeStampedModel):
         ]
         return result
 
-    def get_is_senior(self):
-        if self.kind != self.KIND.quartet:
-            raise ValueError('Must be quartet')
-        Person = apps.get_model('bhs.person')
-        midwinter = datetime.date(2020, 1, 11)
-        persons = Person.objects.filter(
-            members__group=self,
-            members__status__gt=0,
-        )
-        if persons.count() > 4:
-            return False
-        all_over_55 = True
-        total_years = 0
-        for person in persons:
-            try:
-                years = int((midwinter - person.birth_date).days / 365)
-            except TypeError:
-                return False
-            if years < 55:
-                all_over_55 = False
-            total_years += years
-        if all_over_55 and (total_years >= 240):
-            is_senior = True
-        else:
-            is_senior = False
-        return is_senior
+    # def get_is_senior(self):
+    #     if self.kind != self.KIND.quartet:
+    #         raise ValueError('Must be quartet')
+    #     Person = apps.get_model('bhs.person')
+    #     midwinter = datetime.date(2020, 1, 11)
+    #     persons = Person.objects.filter(
+    #         members__group=self,
+    #         members__status__gt=0,
+    #     )
+    #     if persons.count() > 4:
+    #         return False
+    #     all_over_55 = True
+    #     total_years = 0
+    #     for person in persons:
+    #         try:
+    #             years = int((midwinter - person.birth_date).days / 365)
+    #         except TypeError:
+    #             return False
+    #         if years < 55:
+    #             all_over_55 = False
+    #         total_years += years
+    #     if all_over_55 and (total_years >= 240):
+    #         is_senior = True
+    #     else:
+    #         is_senior = False
+    #     return is_senior
+
+    # def get_roster(self):
+    #     Member = apps.get_model('bhs.member')
+    #     wb = Workbook()
+    #     ws = wb.active
+    #     fieldnames = [
+    #         'BHS ID',
+    #         'First Name',
+    #         'Last Name',
+    #         'Expiration Date',
+    #         'Status',
+    #     ]
+    #     ws.append(fieldnames)
+    #     members = self.members.filter(
+    #         status=Member.STATUS.active,
+    #     ).order_by('person__last_name', 'person__first_name')
+    #     for member in members:
+    #         bhs_id = member.person.bhs_id
+    #         first_name = member.person.first_name
+    #         last_name = member.person.last_name
+    #         expiration = member.person.current_through
+    #         status = member.person.get_status_display()
+    #         row = [
+    #             bhs_id,
+    #             first_name,
+    #             last_name,
+    #             expiration,
+    #             status,
+    #         ]
+    #         ws.append(row)
+    #     file = save_virtual_workbook(wb)
+    #     content = ContentFile(file)
+    #     return content
+
+    # def is_searchable(self):
+    #     return bool(self.status == self.STATUS.active)
+
+    # def owner_ids(self):
+    #     return [str(owner.id) for owner in self.owners.all()]
 
 
-
-    # Internals
+    # Group Internals
     objects = GroupManager()
 
     class Meta:
         ordering = ['tree_sort']
         verbose_name_plural = 'Groups'
-        unique_together = (
-            ('bhs_id', 'kind'),
-        )
+        constraints = [
+            models.UniqueConstraint(
+                name='unique_group_kind',
+                fields=[
+                    'bhs_id',
+                    'kind',
+                ]
+            )
+        ]
 
     class JSONAPIMeta:
         resource_name = "group"
@@ -660,7 +680,6 @@ class Group(TimeStampedModel):
         #                     raise ValidationError("Division must be within NED.")
         #             elif self.parent.code == 'SWD' and not 260 <= self.division <= 290:
         #                     raise ValidationError("Division must be within SWD.")
-        return
 
     # Group Permissions
     @staticmethod
@@ -678,26 +697,24 @@ class Group(TimeStampedModel):
     @allow_staff_or_superuser
     @authenticated_users
     def has_write_permission(request):
-        roles = [
-            'SCJC',
-            'Librarian',
-            'Manager',
-        ]
-        return any(item in roles for item in request.user.roles.values_list('name'))
+        return any([
+            request.user.roles.filter(name__in=[
+                'SCJC',
+                'Librarian',
+                'Manager',
+            ])
+        ])
 
     @allow_staff_or_superuser
     @authenticated_users
     def has_object_write_permission(self, request):
         return any([
-            all([
-                'SCJC' in request.user.roles.values_list('name'),
+            request.user.roles.filter(name__in=[
+                'SCJC',
+                'DRCJ',
+                'Manager',
             ]),
-            all([
-                'Librarian' in request.user.roles.values_list('name'),
-            ]),
-            all([
-                self.owners.filter(id__contains=request.user.id),
-            ]),
+            request.user in self.owners.all(),
         ])
 
     # Conditions:
@@ -705,39 +722,39 @@ class Group(TimeStampedModel):
         return
 
     # Transitions
-    @fsm_log_by
-    @fsm_log_description
-    @transition(
-        field=status,
-        source=[
-            STATUS.active,
-            STATUS.inactive,
-            STATUS.new,
-        ],
-        target=STATUS.active,
-        conditions=[
-            can_activate,
-        ]
-    )
-    def activate(self, description=None, *args, **kwargs):
-        """Activate the Group."""
-        self.denormalize()
-        return
+    # @fsm_log_by
+    # @fsm_log_description
+    # @transition(
+    #     field=status,
+    #     source=[
+    #         STATUS.active,
+    #         STATUS.inactive,
+    #         STATUS.new,
+    #     ],
+    #     target=STATUS.active,
+    #     conditions=[
+    #         can_activate,
+    #     ]
+    # )
+    # def activate(self, description=None, *args, **kwargs):
+    #     """Activate the Group."""
+    #     self.denormalize()
+    #     return
 
-    @fsm_log_by
-    @fsm_log_description
-    @transition(
-        field=status,
-        source=[
-            STATUS.active,
-            STATUS.inactive,
-            STATUS.new,
-        ],
-        target=STATUS.inactive,
-    )
-    def deactivate(self, description=None, *args, **kwargs):
-        """Deactivate the Group."""
-        return
+    # @fsm_log_by
+    # @fsm_log_description
+    # @transition(
+    #     field=status,
+    #     source=[
+    #         STATUS.active,
+    #         STATUS.inactive,
+    #         STATUS.new,
+    #     ],
+    #     target=STATUS.inactive,
+    # )
+    # def deactivate(self, description=None, *args, **kwargs):
+    #     """Deactivate the Group."""
+    #     return
 
 
 class Member(TimeStampedModel):
@@ -1130,7 +1147,7 @@ class Person(TimeStampedModel):
         blank=True,
         editable=False,
     )
-    email = LowerEmailField(
+    email = models.EmailField(
         help_text="""
             The contact email of the resource.""",
         blank=True,

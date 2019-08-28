@@ -1,10 +1,7 @@
 
 # Third-Party
 from dry_rest_permissions.generics import DRYPermissionsField
-from rest_framework.serializers import SerializerMethodField
-from rest_framework.validators import UniqueTogetherValidator
 from rest_framework_json_api import serializers
-from rest_framework_json_api.relations import ResourceRelatedField
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
@@ -13,20 +10,14 @@ from phonenumber_field.validators import validate_international_phonenumber
 
 # Local
 from .models import Group
-from .models import Member
-from .models import Officer
 from .models import Person
 
 User = get_user_model()
 validate_url = URLValidator()
 
+
 class GroupSerializer(serializers.ModelSerializer):
     permissions = DRYPermissionsField()
-    included_serializers = {
-        # 'repertories': 'apps.bhs.serializers.RepertorySerializer',
-        # 'members': 'apps.bhs.serializers.MemberSerializer',
-        # 'officers': 'apps.bhs.serializers.OfficerSerializer',
-    }
 
     AIC = {
         503061: "Signature",
@@ -276,6 +267,7 @@ class GroupSerializer(serializers.ModelSerializer):
         model = Group
         fields = [
             'id',
+            'url',
             'name',
             'status',
             'kind',
@@ -329,79 +321,15 @@ class GroupSerializer(serializers.ModelSerializer):
             'modified',
         ]
 
-    class JSONAPIMeta:
-        included_resources = [
-            # 'repertories',
-            # 'members',
-            # 'officers',
-        ]
-
-    # def to_representation(self, instance):
-    #     if instance.kind <= 30:
-    #         self.fields.pop('members')
-    #     return super().to_representation(instance)
-
-
-class MemberSerializer(serializers.ModelSerializer):
-    permissions = DRYPermissionsField()
-
-    class Meta:
-        model = Member
-        fields = [
-            'id',
-            'status',
-            'part',
-            'start_date',
-            'end_date',
-            'group',
-            'person',
-            'permissions',
-        ]
-
-
-class OfficerSerializer(serializers.ModelSerializer):
-    permissions = DRYPermissionsField()
-
-    class Meta:
-        model = Officer
-        fields = [
-            'id',
-            'status',
-            'start_date',
-            'end_date',
-            'office',
-            'person',
-            'group',
-            'permissions',
-        ]
-
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Officer.objects.all(),
-                fields=('person', 'office'),
-                message='This person already holds this office.',
-            )
-        ]
-
 
 class PersonSerializer(serializers.ModelSerializer):
     permissions = DRYPermissionsField()
-    owners = ResourceRelatedField(
-        many=True,
-        read_only=True,
-    )
-    # included_serializers = {
-    #     'owners': 'rest_framework_jwt.serializers.UserSerializer',
-    #     # 'members': 'apps.bhs.serializers.MemberSerializer',
-    #     # 'officers': 'apps.bhs.serializers.OfficerSerializer',
-    # }
-
-
 
     class Meta:
         model = Person
         fields = [
             'id',
+            'url',
             'status',
             'prefix',
             'first_name',
@@ -461,10 +389,4 @@ class PersonSerializer(serializers.ModelSerializer):
             # 'current_district',
             'created',
             'modified',
-        ]
-    class JSONAPIMeta:
-        included_resources = [
-            # 'owners',
-            # 'members',
-            # 'officers',
         ]
