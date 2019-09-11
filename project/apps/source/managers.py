@@ -21,7 +21,7 @@ from django.db.models import When
 User = get_user_model()
 
 class HumanManager(Manager):
-    def export_values(self, cursor=None):
+    def export_values(self, cursor=None, pk=None):
         today = date.today()
         hs = self.filter(
             Q(merged_id="") | Q(merged_id=None),
@@ -30,6 +30,10 @@ class HumanManager(Manager):
         if cursor:
             hs = hs.filter(
                 Q(modified__gte=cursor) | Q(subscriptions__modified__gte=cursor),
+            )
+        if pk:
+            hs = hs.filter(
+                id=pk,
             )
         hs = hs.annotate(
             current_through=Max(
@@ -72,7 +76,7 @@ class HumanManager(Manager):
 
 
 class StructureManager(Manager):
-    def export_values(self, cursor=None):
+    def export_values(self, cursor=None, pk=None):
         active_status = [
             'active',
             'active-internal',
@@ -83,6 +87,10 @@ class StructureManager(Manager):
         if cursor:
             ss = ss.filter(
                 modified__gte=cursor,
+            )
+        if pk:
+            ss = ss.filter(
+                id=pk,
             )
         ss = ss.annotate(
             status_real=Case(
