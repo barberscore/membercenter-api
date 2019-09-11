@@ -5,9 +5,12 @@ from django.contrib import admin
 from .models import Group
 from .models import Person
 
+from django_object_actions import DjangoObjectActions
 from rest_framework_jwt.models import User
 from rest_framework_jwt.models import Role
 from rest_framework.authtoken.models import Token
+
+from django.apps import apps
 
 
 admin.site.unregister(User)
@@ -34,7 +37,7 @@ class ReadOnlyAdmin(admin.ModelAdmin):
 
 
 @admin.register(Group)
-class GroupAdmin(ReadOnlyAdmin):
+class GroupAdmin(DjangoObjectActions, ReadOnlyAdmin):
     save_on_top = True
     fields = [
         'id',
@@ -111,6 +114,15 @@ class GroupAdmin(ReadOnlyAdmin):
     ordering = [
         'tree_sort',
     ]
+
+    def update_from_source(self, request, obj):
+        Structure = apps.get_model('source.structure')
+        structure = Structure.objects.export_values(pk=obj.id)[0]
+        return Group.objects.update_or_create_from_structure(structure)
+    update_from_source.label = "Update"
+    update_from_source.short_description = "Update from Source Database"
+
+    change_actions = ('update_from_source', )
 
 
 @admin.register(Person)
