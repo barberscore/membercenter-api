@@ -592,6 +592,8 @@ class Group(TimeStampedModel):
     def clean(self):
         if self.status != self.STATUS.active:
             return
+        if not self.district and self.bhs_id != 1:
+            raise ValidationError("Active groups must have districts.")
         if self.kind not in [
             self.KIND.chorus,
             self.KIND.quartet,
