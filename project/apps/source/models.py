@@ -51,26 +51,26 @@ class Human(models.Model):
         db_column='created',
         editable=False,
     )
-    created_by_id = models.CharField(
+    created_by = models.CharField(
         max_length=36,
         null=True,
         editable=False,
     )
     modified = models.DateTimeField(
-        db_column='updated',
+        db_column='modified',
         editable=False,
     )
-    modified_by_id = models.CharField(
+    modified_by = models.CharField(
         max_length=36,
         null=True,
         editable=False,
-        db_column='updated_by_id',
+        db_column='modified_by',
     )
     deleted = models.DateTimeField(
         db_column='deleted',
         editable=False,
     )
-    deleted_by_id = models.CharField(
+    deleted_by = models.CharField(
         max_length=36,
         null=True,
         editable=False,
@@ -92,9 +92,10 @@ class Human(models.Model):
         editable=False,
         unique=True,
         db_column='legacy_id',
+        verbose_name='BHS ID',
     )
     gender = models.CharField(
-        max_length=15,
+        max_length=36,
         editable=False,
         db_column='sex',
     )
@@ -175,6 +176,7 @@ class Structure(models.Model):
         unique=True,
         null=True,
         db_column='legacy_id',
+        verbose_name='BHS ID',
     )
     chapter_code = models.CharField(
         max_length=45,
@@ -204,24 +206,24 @@ class Structure(models.Model):
         db_column='created',
         editable=False,
     )
-    created_by_id = models.CharField(
+    created_by = models.CharField(
         max_length=36,
         editable=False,
     )
     modified = models.DateTimeField(
-        db_column='updated',
+        db_column='modified',
         editable=False,
     )
-    modified_by_id = models.CharField(
+    modified_by = models.CharField(
         max_length=36,
         editable=False,
-        db_column='updated_by_id',
+        db_column='modified_by',
     )
     deleted = models.DateTimeField(
         db_column='deleted',
         editable=False,
     )
-    deleted_by_id = models.CharField(
+    deleted_by = models.CharField(
         max_length=36,
         editable=False,
     )
@@ -415,7 +417,7 @@ class Membership(models.Model):
         db_column='created',
         editable=False,
     )
-    created_by_id = models.CharField(
+    created_by = models.CharField(
         max_length=36,
         editable=False,
     )
@@ -423,7 +425,7 @@ class Membership(models.Model):
         db_column='deleted',
         editable=False,
     )
-    deleted_by_id = models.CharField(
+    deleted_by = models.CharField(
         max_length=36,
         editable=False,
     )
@@ -463,7 +465,7 @@ class Subscription(models.Model):
     modified = models.DateTimeField(
         null=True,
         editable=False,
-        db_column='updated',
+        db_column='modified',
     )
     current_through = models.DateField(
         db_column='valid_through',
@@ -564,7 +566,7 @@ class Role(models.Model):
         editable=False,
     )
     modified = models.DateTimeField(
-        db_column='updated',
+        db_column='modified',
         null=True,
         editable=False,
     )
@@ -606,7 +608,7 @@ class Join(models.Model):
         editable=False,
     )
     established_date = models.DateField(
-        db_column='created',
+        db_column='join_date',
         null=True,
         editable=False,
     )
@@ -641,7 +643,7 @@ class Join(models.Model):
         editable=False,
     )
     created = models.DateTimeField(
-        db_column='created_on',
+        db_column='created',
         null=True,
         editable=False,
     )
@@ -701,10 +703,6 @@ class Address(models.Model):
         editable=False,
     )
     status = models.BooleanField(
-        editable=False,
-    )
-    updated = models.DateTimeField(
-        null=True,
         editable=False,
     )
     modified = models.DateTimeField(
