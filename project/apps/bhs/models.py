@@ -1185,8 +1185,8 @@ class Person(TimeStampedModel):
     )
 
     GENDER = Choices(
-        (10, 'male', 'Male'),
-        (20, 'female', 'Female'),
+        (10, '67f0002f-71bd-42b4-8e91-1f5c23802fad', 'Male'),
+        (20, 'b036ccad-fc96-4dba-9c5b-95a03b6cd63a', 'Female'),
     )
 
     gender = models.IntegerField(
