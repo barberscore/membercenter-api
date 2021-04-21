@@ -9,7 +9,7 @@ name = "pypi"
 brotli = "*"
 cloudinary = "*"
 dj-database-url = "*"
-django = "*"
+django = ">=2.2.20"
 django-prettyjson = '*'
 django-cloudinary-storage = "*"
 django-cors-headers = "*"
@@ -24,7 +24,7 @@ django-redis = "*"
 django-reversion = "*"
 django-rq = "*"
 django-timezone-field = "*"
-djangorestframework = "*"
+djangorestframework = ">=3.11.2"
 djangorestframework-jsonapi = "*"
 djangorestframework-jwt = {git = "https://github.com/barberscore/django-rest-framework-jwt.git"}
 # djangorestframework-jwt = {editable = true, path = "./../django-rest-framework-jwt"}
@@ -55,7 +55,7 @@ pydocstyle = "*"
 pylint = "*"
 pytest = "*"
 pytest-django = "*"
-pyyaml = "*"
+pyyaml = ">=5.4"
 
 [requires]
 python_version = "3.7"
