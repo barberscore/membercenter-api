@@ -41,6 +41,7 @@ requests = "*"
 rq = "*"
 sentry-sdk = "*"
 whitenoise = "*"
+django-appconf = "*"
 
 [dev-packages]
 "autopep8" = "*"
