@@ -44,7 +44,7 @@ whitenoise = "*"
 
 [dev-packages]
 "autopep8" = "*"
-django-debug-toolbar = "*"
+django-debug-toolbar = ">=2.2.1"
 django-querycount = "*"
 factory-boy = "*"
 faker = "*"
