@@ -42,6 +42,7 @@ rq = "*"
 sentry-sdk = "*"
 whitenoise = "*"
 django-appconf = "*"
+cryptography = "*"
 
 [dev-packages]
 "autopep8" = "*"

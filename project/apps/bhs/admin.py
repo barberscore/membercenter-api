@@ -8,14 +8,14 @@ from .models import Person
 from django_object_actions import DjangoObjectActions
 from rest_framework_jwt.models import User
 from rest_framework_jwt.models import Role
-from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.models import TokenProxy
 
 from django.apps import apps
 
 
 admin.site.unregister(User)
 admin.site.unregister(Role)
-admin.site.unregister(Token)
+admin.site.unregister(TokenProxy)
 
 admin.site.disable_action('delete_selected')
 
